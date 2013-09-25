@@ -1,0 +1,276 @@
+*
+	margin: 0
+	padding: 0
+	font-size: 100%
+	box-sizing: border-box
+	border: none
+
+html
+	height: 100%
+	overflow-x: hidden
+
+body
+	height: 100%
+	overflow-x: hidden
+	font-size 14px
+	font-family "Georgia", serif
+	line-height 1.3
+	margin 0
+	padding 0
+	color rgb(50,50,50)
+
+#wrapcontent
+	width: 960px
+	margin: auto
+	background-color: rgb(230,230,230)
+
+body,
+p,
+td,
+div
+	word-wrap break-word
+
+p
+	text-align justify
+	-webkit-hyphens auto
+	-moz-hyphens auto
+	hyphens auto
+	margin-bottom 1em
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6
+	font-family: Arial, Verdana, sans-serif
+	line-height: 1.5
+
+h1
+	color black
+	font-size 200%
+	margin: 0.65em 0
+
+h2
+	color #111
+	font-size 160%
+	margin: .875em 0
+
+h3
+	color #111
+	font-size 140%
+	margin: 1em 0
+
+h4
+	color #111
+	font-size 120%
+	margin: 1.17em 0
+
+h5
+	color #111
+	font-size 110%
+	margin: 1.3em 0
+
+h6
+	font-size: 100%
+	margin: 1.5em 0
+
+a
+	-webkit-transition-color: 0.1s ease-in-out
+	transition-color: 0.1s ease-in-out
+	color: #0d6ea1
+	text-decoration: none
+	cursor: pointer
+	&:hover
+		color: #3593d9
+
+img
+	max-width 100%
+	max-height 400px
+	padding 1em
+	background-color white
+	box-shadow 1px 1px 2px rgba(0,0,0,0.2)
+
+figure
+	margin-bottom 2em
+
+figcaption
+	font-style italic
+
+mark
+	display inline-block
+	padding 1em
+	background-color rgb(250,210,0)
+
+pre
+	margin-bottom: 1em
+	code
+		display: block
+		white-space: pre
+
+code
+	margin: 0 2px
+	padding: 0 5px
+	white-space: nowrap
+	border: 1px solid rgb(200,200,200)
+	background-color: rgb(240,240,240)
+	border-radius: 3px
+	font-family: Consolas, 'Liberation Mono', Courier, monospace
+	font-size: 0.9em
+
+table
+	border-collapse collapse
+	margin-bottom 2em
+	caption
+		font-family sans-serif
+		margin-bottom 1em
+		font-weight 900
+		font-size 1.2em
+	tr
+		&:nth-of-type(2n)
+			background-color rgba(0,0,0,0.05)
+		&:nth-of-type(2n + 1)
+				background-color rgba(0,0,0,0)
+	th
+		background-color rgba(0,0,0,0.05)
+		font-family sans-serif
+		&:empty
+			display none
+	th, td
+		padding 0.2em 0.4em
+		border 1px solid rgb(180,180,180)
+
+dl
+	margin-bottom 2em
+	dt
+		font-weight 900
+		margin-bottom 0.5em
+		font-family sans-serif
+	dd
+		margin-left 1em
+		& > p
+			margin-bottom 0.5em
+
+ul,
+ol
+	margin-left 2em
+	margin-bottom 1em
+
+
+li
+	p
+		margin-bottom 0.5em
+
+blockquote
+	margin 0 2em
+	color rgb(0,100,140)
+	p
+		font-style italic
+
+dd + dt
+	margin-top 1.5em
+
+hr
+	margin-bottom 2em
+
+
+article
+	display: inline-block
+	vertical-align: top
+	width: 670px
+	padding: 2em
+
+#toolbar
+	width: 30px
+	height: 100%
+	display: inline-block
+	vertical-align: top
+	menu
+		position: fixed
+		height: 100%
+		width: 30px
+		overflow-y: auto
+		padding: 5px
+		background-color: rgb(20,20,20)
+		button
+			height: 20px
+			width: 20px
+			color: white
+			background-color: transparent
+			cursor: pointer
+			border-radius: 10px
+			border: 1px solid white
+
+
+#toc
+	height: 100%
+	display: inline-block
+	vertical-align: top
+	width: 250px
+	overflow-y: auto
+	menu
+		position: absolute
+		width: 250px
+		top: 0
+		z-index: 1000
+		background-color: rgb(30,30,30)
+		padding: 5px
+		button
+			height: 20px
+			padding: 0 5px
+			border-radius: 2px
+			background-color: rgb(50,50,50)
+			color: rgb(200,200,200)
+			font-size: 0.8em
+			cursor: pointer
+			margin-right: 5px
+			&:active
+				background-color: rgb(80,80,80)
+
+
+	nav
+		position: fixed
+		height: 100%
+		-webkit-font-smoothing: antialiased
+		font-smoothing: antialiased
+		line-height: 0.8
+		width: 250px
+		overflow-y: auto
+		background-color: rgb(50,50,50)
+		padding: 50px 20px 20px 20px
+		font-family: Arial, sans-serif
+		ul
+			list-style: none
+			margin: 0 0 0.6em 0.8em
+		> ul
+			margin-left: 0
+		ul
+			li
+				margin-bottom: 0.4em
+				a
+					color: rgb(150,250,250)
+					font-weight 900
+					font-size 80%
+			ul
+				li
+					a
+						color: rgb(200,200,250)
+						font-weight 500
+						font-size 76%
+				ul
+					li
+						a
+							color: rgb(200,250,200)
+							font-size 72%
+					ul
+						li
+							a
+								color: rgb(250,200,200)
+								font-size 68%
+						ul
+							li
+								a
+									color: rgb(250,250,150)
+									font-size 64%
+	& > ul
+		margin-left 10px

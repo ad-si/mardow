@@ -1,0 +1,55 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>{{title}}</title>
+    <link rel="stylesheet" href="css/screen.css"/>
+</head>
+<body>
+
+<div id="wrapcontent">
+
+    <aside id=toolbar>
+        <menu>
+            <button class="info">i</button>
+        </menu>
+    </aside><aside id=toc>
+        <menu></menu>
+        <nav>
+            {{&toc}}
+        </nav>
+    </aside><article>
+        {{&content}}
+    </article>
+</div>
+
+<script type="text/javascript">
+
+    info = {
+        lines: {{lines}},
+        allLines: {{allLines}},
+        paragraphs: {{paragraphs}},
+        words: {{words}},
+        allWords: {{allWords}},
+        chars: {{chars}},
+        images: {{images}},
+        tables: {{tables}},
+        code: {{code}},
+        math: {{math}}
+    }
+
+</script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+<script src="js/index.js"></script>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config(
+        {
+            asciimath2jax:{
+                delimiters:[['´','´']]
+            }
+        }
+    )
+</script>
+<script src="http://cdn.mathjax.org/mathjax/2.2-latest/MathJax.js?config=AM_HTMLorMML"></script>
+</body>
+</html>
