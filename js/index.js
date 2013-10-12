@@ -14,6 +14,31 @@
 			h6: 'ul ul ul ul ul ul ul'
 		}
 
+	function convertToSlug(text) {
+
+		// TODO: Combining characters
+
+		var dict = {
+			ä: "ae",
+			ö: "oe",
+			ü: "ue",
+			ß: "ss"
+		}
+
+		return String(text)
+			.toLowerCase()
+			.split('')
+			.map(function (character) {
+				return dict[character] || character
+			})
+			.join('')
+			.replace(/\s+/g, '-')
+			.replace(/-+/g, '-')
+			.replace(/[^\w-]+/g, '')
+	}
+
+	console.clear()
+
 	for (a = 1; a <= 6; a++)
 		!function () {
 
@@ -39,46 +64,44 @@
 		}()
 
 
+	// headings is a NodeList => forEach not possible
 	for (i = 0; i < headings.length; i++) {
+		!function () {
 
-		headings[i].id = headings[i]
-			.textContent
-			.toLowerCase()
-			.replace(/\s/g, '-')
+			// TODO: Prevent id-collisions
+
+			var $heading = $(headings[i])
+
+			$heading
+				.prepend('<span class="glyphicon glyphicon-link"></span>')
+				.attr('id', convertToSlug($heading.text()))
+				.find('span')
+				.click(function () {
+					console.log(this)
+					document.location.hash = this.parentNode.id
+				})
+		}()
 	}
 
 
 	for (i = 0; i < links.length; i++) {
 
 		links[i].addEventListener('click', function () {
-
-			location.hash = this
-				.textContent
-				.toLowerCase()
-				.replace(/\s/g, '-')
+			location.hash = convertToSlug(this.textContent)
 		})
 	}
 
-	console.time('Replace img with figure')
-
 	$('article img').each(function () {
 
-		var figure = $('<figure><figcaption>' + this.alt +'</figcaption></figure>')
+		var figure = $('<figure><figcaption>' + this.alt + '</figcaption></figure>')
 
 		$(this).after(figure)
 		$(this).prependTo(figure)
 	})
 
-	console.timeEnd('Replace img with figure')
-
 	document
 		.querySelector('#toolbar .info')
 		.addEventListener('click', function () {
-
-			var chars = document
-				.querySelector('article')
-				.innerHTML
-				.length
 
 			alert(
 				'Paragraphs:\t\t\t\t\t\t' + info.paragraphs + '\n' +
@@ -95,5 +118,6 @@
 			)
 		})
 
+	hljs.initHighlighting()
 
 }(window, document)
