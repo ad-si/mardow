@@ -2,8 +2,11 @@
 
 var program = require('commander'),
 	fs = require('fs'),
-	pjson = require('../package.json'),
-	mardow = require('../index.js')
+	packageFile = require('../package.json'),
+	mardow = require('../index.js'),
+	defaults = {
+		port: 3000
+	}
 
 function range(val) {
 	return val.split('..').map(Number)
@@ -18,19 +21,30 @@ function checkIfExists(file){
 }
 
 program
+	.option('-p --port <n>', 'Set port [default: 3000]')
+
+program
 	.command('serve')
 	.description('Serve the markdown file on localhost.')
-	.action(function (cmd) {
-		console.log('Usage: serve [options ...] [file]')
+	.action(function (name) {
+
+		if(typeof name === 'object')
+			console.log('Usage: serve [options ...] [file]')
+
+		else {
+			console.log('Serve ' + name)
+			mardow(name, program.port || defaults.port)
+		}
 	})
 
 program
-	.version(pjson.version)
+	.version(packageFile.version)
 	.usage('[command] [options] [file]')
 	.description('')
 
 
 program.parse(process.argv)
+
 
 if (!program.args.length){
 
@@ -38,7 +52,7 @@ if (!program.args.length){
 
 		console.log('Serve index.md')
 
-		mardow('./index.md')
+		mardow('./index.md', program.port || defaults.port)
 	}
 	else
 		program.help()

@@ -7,13 +7,19 @@ var marked = require('marked'),
 	stylus = require('stylus')
 
 
+/** Please stop reading!
+ * This is the ugliest code I've ever written.
+ * I don't want anybody to see it! ^^
+ */
+
+
 marked.setOptions({
 	breaks: true,
 	sanitize: false,
 	langPrefix: 'lang-'
 })
 
-module.exports = function (mdPath) {
+module.exports = function (mdPath, port) {
 
 	var data = {},
 		template,
@@ -21,6 +27,7 @@ module.exports = function (mdPath) {
 		html,
 		content,
 		server
+
 	//stylusString = fs.readFileSync(__dirname + '/styl/screen.styl', 'utf8'),
 
 	server = function (request, response) {
@@ -35,7 +42,8 @@ module.exports = function (mdPath) {
 				paragraphs: 0
 			},
 			tokens,
-			toc = []
+			toc = [],
+			firstHeading = false
 
 		if (fileExtension === 'css') {
 
@@ -47,14 +55,15 @@ module.exports = function (mdPath) {
 					if (err) throw err
 
 					stylus(stylusString)
-						.set('compress', true)
+						//.set('compress', true)
 						//.use(nib())
 						//.import('nib')
 						//.define('url', stylus.url())
+						.import(__dirname + '/styl/tomorrow-night.styl')
 						.render(function (err, css) {
 
 							if (err) throw err
-
+							
 							response.writeHead(200, {
 								"Content-Type": "text/css"
 							})
@@ -98,6 +107,10 @@ module.exports = function (mdPath) {
 
 								var diff = token.depth - previousLevel
 
+								if(!firstHeading)
+									firstHeading = token.text
+
+
 								if (diff === 1) {
 									toc.push('<ul><li><a>' + token.text + '</a></li>')
 								}
@@ -137,21 +150,67 @@ module.exports = function (mdPath) {
 							return n !== '' && n.length !== 1
 						}
 
+						function removePunctuation(word){
+							return word.replace(/['";:,.\/?\\-]/g, '')
+						}
+
+						function wordHistogram(words){
+
+							var histogram = [],
+								dict = {},
+								i = 1
+
+							words.forEach(function(word){
+
+								if(dict.hasOwnProperty(word))
+									dict[word] = Number(dict[word]) + 1
+								else
+									dict[word] = 1
+							})
+
+
+							for (var word in dict)
+								if(dict.hasOwnProperty(word)){
+									histogram.push({
+										nr: i,
+										word: word,
+										count: dict[word]
+									})
+
+									i++
+								}
+
+							histogram
+								.sort(function(a, b) {
+									return a.count - b.count
+								})
+
+							return histogram
+						}
+
 
 						marked(markdown, {}, function (err, content) {
 
 							if (err) throw err
 
-							data.title = 'Mardow'
+							var images = markdown.match(/!\[.*]\(.+\)/g),
+								words = markdown
+									.split(/\s/g)
+									.filter(wordFilter)
+									.map(removePunctuation)
+
+							//console.dir(wordHistogram(words))
+
+							data.title = firstHeading
 							data.toc = toc.join('')
 							data.content = content
 
 							data.lines = markdown.split(/\n/g).filter(function(n){return n !== ''}).length
 							data.allLines = markdown.split('\n').length
-							data.words = markdown.split(/\s/g).filter(wordFilter).length
+							data.words = words.filter(wordFilter).length
 							data.allWords = markdown.split(/\s/g).filter(function(n){return n !== ''}).length
 							data.chars = markdown.length
-							data.images = markdown.match(/!\[.*]\(.+\)/g).length
+							data.images = images ? images.length : 0
 							data.code = stats.code
 							data.tables = stats.tables
 							data.paragraphs = stats.paragraphs
@@ -168,7 +227,7 @@ module.exports = function (mdPath) {
 							response.end()
 						})
 					}
-					else if (fileExtension === 'png') {
+					else if (fileExtension === 'png' || fileExtension === 'jpg') {
 						fs.readFile(filename, 'binary', function (err, file) {
 
 							if (!err) {
@@ -195,5 +254,5 @@ module.exports = function (mdPath) {
 
 	http
 		.createServer(server)
-		.listen(3000)
+		.listen(port)
 }

@@ -16,7 +16,7 @@
 
 	function convertToSlug(text) {
 
-		// TODO: Combining characters
+		// TODO: Combining characters / Unicode normalisation
 
 		var dict = {
 			ä: "ae",
