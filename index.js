@@ -1,10 +1,10 @@
 var marked = require('marked'),
-	fs = require('fs'),
-	url = require('url'),
-	path = require('path'),
-	mustache = require('mustache'),
-	http = require('http'),
-	stylus = require('stylus')
+    fs = require('fs'),
+    url = require('url'),
+    path = require('path'),
+    mustache = require('mustache'),
+    http = require('http'),
+    stylus = require('stylus')
 
 
 /** Please stop reading!
@@ -22,33 +22,33 @@ marked.setOptions({
 module.exports = function (mdPath, port) {
 
 	var data = {},
-		template,
-		markdown,
-		html,
-		content,
-		server
+	    template,
+	    markdown,
+	    html,
+	    server
+
 
 	//stylusString = fs.readFileSync(__dirname + '/styl/screen.styl', 'utf8'),
 
 	server = function (request, response) {
 
 		var uri = url.parse(request.url).pathname,
-			filename = path.join(process.cwd(), uri),
-			fileExtension = filename.split('.').pop(),
-			stats = {
-				code: 0,
-				tables: 0,
-				images: 0,
-				paragraphs: 0
-			},
-			tokens,
-			toc = [],
-			firstHeading = false
+		    filename = path.join(process.cwd(), uri),
+		    fileExtension = filename.split('.').pop(),
+		    stats = {
+			    code: 0,
+			    tables: 0,
+			    images: 0,
+			    paragraphs: 0
+		    },
+		    tokens,
+		    toc = [],
+		    firstHeading = false
 
 		if (fileExtension === 'css') {
 
 			fs.readFile(
-				__dirname + '/styl/screen.styl',
+					__dirname + '/styl/screen.styl',
 				'utf8',
 				function (err, stylusString) {
 
@@ -63,7 +63,7 @@ module.exports = function (mdPath, port) {
 						.render(function (err, css) {
 
 							if (err) throw err
-							
+
 							response.writeHead(200, {
 								"Content-Type": "text/css"
 							})
@@ -74,25 +74,47 @@ module.exports = function (mdPath, port) {
 		}
 		else if (fileExtension === 'js') {
 
-			fs.readFile(__dirname + '/js/index.js', 'utf8', function (err, file) {
+			fs.readFile(filename, 'utf8', function (err, file) {
 
-				if (!err) {
-					response.writeHead(200, {"Content-Type": "application/x-javascript"})
-					response.write(file, "utf8")
-				}
-				else {
+				if (err) {
 					response.writeHead(500, {"Content-Type": "text/plain"})
 					response.write(err + "\n")
 				}
+				else {
+					response.writeHead(200, {"Content-Type": "application/x-javascript"})
+					response.write(file, "utf8")
+				}
 
 				response.end()
+			})
+		}
+		else if (fileExtension === 'png' ||
+		         fileExtension === 'gif' ||
+		         fileExtension === 'jpeg' ||
+		         fileExtension === 'jpg') {
+
+			fs.readFile(path.dirname(mdPath) + uri, function (err, file) {
+
+				if (err) {
+					response.writeHead(500, {"Content-Type": "text/plain"})
+					response.write(err + "\n")
+					response.end()
+				}
+				else {
+					response.writeHead(200, {"Content-Type": "image/" + fileExtension})
+					response.end(file, 'binary')
+				}
 			})
 		}
 		else {
 
 			fs.exists(filename, function (exists) {
 
-				if (exists) {
+				if (!exists) {
+					response.writeHead(404, {"Content-Type": "text/plain"})
+					response.write("404 Not Found\n")
+				}
+				else {
 
 					if (fs.statSync(filename).isDirectory()) {
 
@@ -107,7 +129,7 @@ module.exports = function (mdPath, port) {
 
 								var diff = token.depth - previousLevel
 
-								if(!firstHeading)
+								if (!firstHeading)
 									firstHeading = token.text
 
 
@@ -124,21 +146,21 @@ module.exports = function (mdPath, port) {
 									}
 
 									toc.push('<li><a href="#' + token.text + '">' +
-										token.text + '</a></li>')
+									         token.text + '</a></li>')
 								}
 
 								previousLevel = token.depth
 							}
-							if(token.type === 'code')
+							if (token.type === 'code')
 								stats.code++
-							if(token.type === 'table')
+							if (token.type === 'table')
 								stats.tables++
-							if(token.type === 'paragraph'){
+							if (token.type === 'paragraph') {
 
 								stats.paragraphs++
 
 								// Omit paragraph if it only contains an image
-								if(token.text.match(/^!\[.*]\(.+\)$/g))
+								if (token.text.match(/^!\[.*]\(.+\)$/g))
 									stats.paragraphs--
 							}
 
@@ -146,23 +168,23 @@ module.exports = function (mdPath, port) {
 
 						toc.push('</ul>')
 
-						function wordFilter(n){
+						function wordFilter (n) {
 							return n !== '' && n.length !== 1
 						}
 
-						function removePunctuation(word){
+						function removePunctuation (word) {
 							return word.replace(/['";:,.\/?\\-]/g, '')
 						}
 
-						function wordHistogram(words){
+						function wordHistogram (words) {
 
 							var histogram = [],
-								dict = {},
-								i = 1
+							    dict = {},
+							    i = 1
 
-							words.forEach(function(word){
+							words.forEach(function (word) {
 
-								if(dict.hasOwnProperty(word))
+								if (dict.hasOwnProperty(word))
 									dict[word] = Number(dict[word]) + 1
 								else
 									dict[word] = 1
@@ -170,7 +192,7 @@ module.exports = function (mdPath, port) {
 
 
 							for (var word in dict)
-								if(dict.hasOwnProperty(word)){
+								if (dict.hasOwnProperty(word)) {
 									histogram.push({
 										nr: i,
 										word: word,
@@ -181,7 +203,7 @@ module.exports = function (mdPath, port) {
 								}
 
 							histogram
-								.sort(function(a, b) {
+								.sort(function (a, b) {
 									return a.count - b.count
 								})
 
@@ -194,21 +216,31 @@ module.exports = function (mdPath, port) {
 							if (err) throw err
 
 							var images = markdown.match(/!\[.*]\(.+\)/g),
-								words = markdown
-									.split(/\s/g)
-									.filter(wordFilter)
-									.map(removePunctuation)
+							    words = markdown
+								    .split(/\s/g)
+								    .filter(wordFilter)
+								    .map(removePunctuation)
 
-							//console.dir(wordHistogram(words))
+							//TODO: wordHistogram(words)
 
 							data.title = firstHeading
 							data.toc = toc.join('')
 							data.content = content
 
-							data.lines = markdown.split(/\n/g).filter(function(n){return n !== ''}).length
+							data.lines = markdown
+								.split(/\n/g)
+								.filter(function (n) {
+									return n !== ''
+								})
+								.length
 							data.allLines = markdown.split('\n').length
 							data.words = words.filter(wordFilter).length
-							data.allWords = markdown.split(/\s/g).filter(function(n){return n !== ''}).length
+							data.allWords = markdown
+								.split(/\s/g)
+								.filter(function (n) {
+									return n !== ''
+								})
+								.length
 							data.chars = markdown.length
 							data.images = images ? images.length : 0
 							data.code = stats.code
@@ -217,14 +249,14 @@ module.exports = function (mdPath, port) {
 							data.math = markdown.split("´").length - 1
 
 
-							template = fs.readFileSync(__dirname + '/templates/index.html', 'utf8')
+							template = fs.readFileSync(__dirname +
+							                           '/templates/index.html', 'utf8')
 							html = mustache.render(template, data)
 
 							response.writeHead(200, {
 								"Content-Type": "text/html"
 							})
 							response.write(html, "utf8")
-							response.end()
 						})
 					}
 					else if (fileExtension === 'png' || fileExtension === 'jpg') {
@@ -238,16 +270,11 @@ module.exports = function (mdPath, port) {
 								response.writeHead(500, {"Content-Type": "text/plain"})
 								response.write(err + "\n")
 							}
-
-							response.end()
 						})
 					}
 				}
-				else {
-					response.writeHead(404, {"Content-Type": "text/plain"})
-					response.write("404 Not Found\n")
-					response.end()
-				}
+
+				response.end()
 			})
 		}
 	}

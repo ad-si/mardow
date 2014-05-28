@@ -26,10 +26,10 @@
     "url": "https://github.com/adius/mardow/issues"
   },
   "dependencies": {
-    "marked": "~0.2.9",
-    "commander": "~2.0.0",
-    "mustache": "~0.7.2",
-    "stylus": "~0.37.0"
+    "marked": "~0.3.2",
+    "commander": "~2.2.0",
+    "mustache": "~0.8.1",
+    "stylus": "~0.45.1"
   },
   "preferGlobal": "true"
 }

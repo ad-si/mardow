@@ -1,20 +1,20 @@
 !function (window, document) {
 
 	var links = document.querySelectorAll('aside a'),
-		headings = document.querySelectorAll('h1,h2,h3,h4,h5,h6'),
-		images = document.querySelectorAll('article img'),
-		i,
-		a,
-		map = {
-			h1: 'ul ul',
-			h2: 'ul ul ul',
-			h3: 'ul ul ul ul',
-			h4: 'ul ul ul ul ul',
-			h5: 'ul ul ul ul ul ul',
-			h6: 'ul ul ul ul ul ul ul'
-		}
+	    headings = document.querySelectorAll('h1,h2,h3,h4,h5,h6'),
+	    images = document.querySelectorAll('article img'),
+	    i,
+	    a,
+	    map = {
+		    h1: 'ul ul',
+		    h2: 'ul ul ul',
+		    h3: 'ul ul ul ul',
+		    h4: 'ul ul ul ul ul',
+		    h5: 'ul ul ul ul ul ul',
+		    h6: 'ul ul ul ul ul ul ul'
+	    }
 
-	function convertToSlug(text) {
+	function convertToSlug (text) {
 
 		// TODO: Combining characters / Unicode normalisation
 
@@ -37,8 +37,6 @@
 			.replace(/[^\w-]+/g, '')
 	}
 
-	console.clear()
-
 	for (a = 1; a <= 6; a++)
 		!function () {
 
@@ -48,7 +46,7 @@
 			button.addEventListener('click', function () {
 
 				var lists = document.querySelectorAll('aside ' + map[this.textContent]),
-					allLists = document.querySelectorAll('aside ul')
+				    allLists = document.querySelectorAll('aside ul')
 
 				for (i = 0; i < allLists.length; i++)
 					allLists[i].style.display = 'inherit'
@@ -104,7 +102,7 @@
 		.addEventListener('click', function () {
 
 			alert(
-				'Paragraphs:\t\t\t\t\t\t' + info.paragraphs + '\n' +
+					'Paragraphs:\t\t\t\t\t\t' + info.paragraphs + '\n' +
 					'Lines:\t\t\t\t\t\t\t' + info.lines + '\n' +
 					'Lines (inclusive empty new lines):\t\t' + info.allLines + '\n' +
 					'Words:\t\t\t\t\t\t\t' + info.words + '\n' +
