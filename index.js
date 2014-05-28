@@ -43,12 +43,41 @@ module.exports = function (mdPath, port) {
 		    },
 		    tokens,
 		    toc = [],
-		    firstHeading = false
+		    firstHeading = false,
+		    imageTypes = [
+			    'png',
+			    'gif',
+			    'jpeg',
+			    'jpg'
+		    ],
+		    isImage = imageTypes.indexOf(fileExtension) != -1
 
-		if (fileExtension === 'css') {
+
+		if (!isImage &&
+		    fileExtension !== 'css' &&
+		    fileExtension !== 'ico' &&
+		    !fs.existsSync(filename)) {
+
+			response.writeHead(404, {"Content-Type": "text/plain"})
+			response.write("404 Not Found\n")
+			response.end()
+			return
+		}
+
+
+		if (fileExtension === 'ico') {
+			fs.readFile('img/favicon.png', function (err, file) {
+
+				if (err) throw err
+
+				response.writeHead(200, {"Content-Type": "image/png"})
+				response.end(file, 'binary')
+			})
+		}
+		else if (fileExtension === 'css') {
 
 			fs.readFile(
-					__dirname + '/styl/screen.styl',
+				(__dirname + '/styl/screen.styl'),
 				'utf8',
 				function (err, stylusString) {
 
@@ -88,10 +117,7 @@ module.exports = function (mdPath, port) {
 				response.end()
 			})
 		}
-		else if (fileExtension === 'png' ||
-		         fileExtension === 'gif' ||
-		         fileExtension === 'jpeg' ||
-		         fileExtension === 'jpg') {
+		else if (isImage) {
 
 			fs.readFile(path.dirname(mdPath) + uri, function (err, file) {
 
@@ -106,178 +132,152 @@ module.exports = function (mdPath, port) {
 				}
 			})
 		}
-		else {
+		else if (fs.statSync(filename).isDirectory()) {
 
-			fs.exists(filename, function (exists) {
+			markdown = fs.readFileSync(mdPath, 'utf8')
+			tokens = marked.lexer(markdown)
 
-				if (!exists) {
-					response.writeHead(404, {"Content-Type": "text/plain"})
-					response.write("404 Not Found\n")
+			var previousLevel = 0
+
+			tokens.forEach(function (token) {
+
+				if (token.type === 'heading') {
+
+					var diff = token.depth - previousLevel
+
+					if (!firstHeading)
+						firstHeading = token.text
+
+
+					if (diff === 1) {
+						toc.push('<ul><li><a>' + token.text + '</a></li>')
+					}
+					else if (diff === 0) {
+						toc.push('<li><a>' + token.text + '</a></li>')
+					}
+					else if (diff <= -1) {
+
+						for (; diff < 0; diff++) {
+							toc.push('</ul></li>')
+						}
+
+						toc.push('<li><a href="#' + token.text + '">' +
+						         token.text + '</a></li>')
+					}
+
+					previousLevel = token.depth
 				}
-				else {
+				if (token.type === 'code')
+					stats.code++
+				if (token.type === 'table')
+					stats.tables++
+				if (token.type === 'paragraph') {
 
-					if (fs.statSync(filename).isDirectory()) {
+					stats.paragraphs++
 
-						markdown = fs.readFileSync(mdPath, 'utf8')
-						tokens = marked.lexer(markdown)
-
-						var previousLevel = 0
-
-						tokens.forEach(function (token) {
-
-							if (token.type === 'heading') {
-
-								var diff = token.depth - previousLevel
-
-								if (!firstHeading)
-									firstHeading = token.text
-
-
-								if (diff === 1) {
-									toc.push('<ul><li><a>' + token.text + '</a></li>')
-								}
-								else if (diff === 0) {
-									toc.push('<li><a>' + token.text + '</a></li>')
-								}
-								else if (diff <= -1) {
-
-									for (; diff < 0; diff++) {
-										toc.push('</ul></li>')
-									}
-
-									toc.push('<li><a href="#' + token.text + '">' +
-									         token.text + '</a></li>')
-								}
-
-								previousLevel = token.depth
-							}
-							if (token.type === 'code')
-								stats.code++
-							if (token.type === 'table')
-								stats.tables++
-							if (token.type === 'paragraph') {
-
-								stats.paragraphs++
-
-								// Omit paragraph if it only contains an image
-								if (token.text.match(/^!\[.*]\(.+\)$/g))
-									stats.paragraphs--
-							}
-
-						})
-
-						toc.push('</ul>')
-
-						function wordFilter (n) {
-							return n !== '' && n.length !== 1
-						}
-
-						function removePunctuation (word) {
-							return word.replace(/['";:,.\/?\\-]/g, '')
-						}
-
-						function wordHistogram (words) {
-
-							var histogram = [],
-							    dict = {},
-							    i = 1
-
-							words.forEach(function (word) {
-
-								if (dict.hasOwnProperty(word))
-									dict[word] = Number(dict[word]) + 1
-								else
-									dict[word] = 1
-							})
-
-
-							for (var word in dict)
-								if (dict.hasOwnProperty(word)) {
-									histogram.push({
-										nr: i,
-										word: word,
-										count: dict[word]
-									})
-
-									i++
-								}
-
-							histogram
-								.sort(function (a, b) {
-									return a.count - b.count
-								})
-
-							return histogram
-						}
-
-
-						marked(markdown, {}, function (err, content) {
-
-							if (err) throw err
-
-							var images = markdown.match(/!\[.*]\(.+\)/g),
-							    words = markdown
-								    .split(/\s/g)
-								    .filter(wordFilter)
-								    .map(removePunctuation)
-
-							//TODO: wordHistogram(words)
-
-							data.title = firstHeading
-							data.toc = toc.join('')
-							data.content = content
-
-							data.lines = markdown
-								.split(/\n/g)
-								.filter(function (n) {
-									return n !== ''
-								})
-								.length
-							data.allLines = markdown.split('\n').length
-							data.words = words.filter(wordFilter).length
-							data.allWords = markdown
-								.split(/\s/g)
-								.filter(function (n) {
-									return n !== ''
-								})
-								.length
-							data.chars = markdown.length
-							data.images = images ? images.length : 0
-							data.code = stats.code
-							data.tables = stats.tables
-							data.paragraphs = stats.paragraphs
-							data.math = markdown.split("´").length - 1
-
-
-							template = fs.readFileSync(__dirname +
-							                           '/templates/index.html', 'utf8')
-							html = mustache.render(template, data)
-
-							response.writeHead(200, {
-								"Content-Type": "text/html"
-							})
-							response.write(html, "utf8")
-						})
-					}
-					else if (fileExtension === 'png' || fileExtension === 'jpg') {
-						fs.readFile(filename, 'binary', function (err, file) {
-
-							if (!err) {
-								response.writeHead(200, {"Content-Type": "image/png"})
-								response.write(file, "binary")
-							}
-							else {
-								response.writeHead(500, {"Content-Type": "text/plain"})
-								response.write(err + "\n")
-							}
-						})
-					}
+					// Omit paragraph if it only contains an image
+					if (token.text.match(/^!\[.*]\(.+\)$/g))
+						stats.paragraphs--
 				}
 
+			})
+
+			toc.push('</ul>')
+
+			function wordFilter (n) {
+				return n !== '' && n.length !== 1
+			}
+
+			function removePunctuation (word) {
+				return word.replace(/['";:,.\/?\\-]/g, '')
+			}
+
+			function wordHistogram (words) {
+
+				var histogram = [],
+				    dict = {},
+				    i = 1
+
+				words.forEach(function (word) {
+
+					if (dict.hasOwnProperty(word))
+						dict[word] = Number(dict[word]) + 1
+					else
+						dict[word] = 1
+				})
+
+
+				for (var word in dict)
+					if (dict.hasOwnProperty(word)) {
+						histogram.push({
+							nr: i,
+							word: word,
+							count: dict[word]
+						})
+
+						i++
+					}
+
+				histogram
+					.sort(function (a, b) {
+						return a.count - b.count
+					})
+
+				return histogram
+			}
+
+
+			marked(markdown, {}, function (err, content) {
+
+				if (err) throw err
+
+				var images = markdown.match(/!\[.*]\(.+\)/g),
+				    words = markdown
+					    .split(/\s/g)
+					    .filter(wordFilter)
+					    .map(removePunctuation)
+
+				//TODO: wordHistogram(words)
+
+				data.title = firstHeading
+				data.toc = toc.join('')
+				data.content = content
+
+				data.lines = markdown
+					.split(/\n/g)
+					.filter(function (n) {
+						return n !== ''
+					})
+					.length
+				data.allLines = markdown.split('\n').length
+				data.words = words.filter(wordFilter).length
+				data.allWords = markdown
+					.split(/\s/g)
+					.filter(function (n) {
+						return n !== ''
+					})
+					.length
+				data.chars = markdown.length
+				data.images = images ? images.length : 0
+				data.code = stats.code
+				data.tables = stats.tables
+				data.paragraphs = stats.paragraphs
+				data.math = markdown.split("´").length - 1
+
+
+				template = fs.readFileSync(__dirname +
+				                           '/templates/index.html', 'utf8')
+				html = mustache.render(template, data)
+
+				response.writeHead(200, {
+					"Content-Type": "text/html"
+				})
+				response.write(html, "utf8")
 				response.end()
 			})
 		}
 	}
+
 
 	http
 		.createServer(server)
