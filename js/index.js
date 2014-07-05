@@ -116,6 +116,19 @@
 			)
 		})
 
+	document
+		.querySelector('#toolbar .th-list')
+		.addEventListener('click', function () {
+
+			var toc = document.querySelector('#toc'),
+			    style = window.getComputedStyle(toc)
+
+			toc.style.display = (style.display === 'none') ?
+			                    'inline-block' :
+	                            'none'
+		})
+
 	hljs.initHighlighting()
+
 
 }(window, document)

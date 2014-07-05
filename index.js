@@ -33,8 +33,8 @@ module.exports = function (mdPath, port) {
 	server = function (request, response) {
 
 		var uri = url.parse(request.url).pathname,
-		    filename = path.join(process.cwd(), uri),
-		    fileExtension = filename.split('.').pop(),
+		    fileName = path.join(process.cwd(), uri),
+		    fileExtension = fileName.split('.').pop(),
 		    stats = {
 			    code: 0,
 			    tables: 0,
@@ -50,23 +50,28 @@ module.exports = function (mdPath, port) {
 			    'jpeg',
 			    'jpg'
 		    ],
-		    isImage = imageTypes.indexOf(fileExtension) != -1
-
+		    allowedFileTypes = [
+			    'css',
+			    'ico',
+			    'js'
+		    ],
+		    isImage = imageTypes.indexOf(fileExtension) != -1,
+			isAllowedFileType = allowedFileTypes.indexOf(fileExtension) != -1
 
 		if (!isImage &&
-		    fileExtension !== 'css' &&
-		    fileExtension !== 'ico' &&
-		    !fs.existsSync(filename)) {
+		    !isAllowedFileType &&
+		    !fs.existsSync(fileName)) {
 
 			response.writeHead(404, {"Content-Type": "text/plain"})
 			response.write("404 Not Found\n")
 			response.end()
+
 			return
 		}
 
 
 		if (fileExtension === 'ico') {
-			fs.readFile('img/favicon.png', function (err, file) {
+			fs.readFile(__dirname + '/img/favicon.png', function (err, file) {
 
 				if (err) throw err
 
@@ -103,7 +108,7 @@ module.exports = function (mdPath, port) {
 		}
 		else if (fileExtension === 'js') {
 
-			fs.readFile(filename, 'utf8', function (err, file) {
+			fs.readFile(__dirname + uri, 'utf8', function (err, file) {
 
 				if (err) {
 					response.writeHead(500, {"Content-Type": "text/plain"})
@@ -132,7 +137,7 @@ module.exports = function (mdPath, port) {
 				}
 			})
 		}
-		else if (fs.statSync(filename).isDirectory()) {
+		else if (fs.statSync(fileName).isDirectory()) {
 
 			markdown = fs.readFileSync(mdPath, 'utf8')
 			tokens = marked.lexer(markdown)

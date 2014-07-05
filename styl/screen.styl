@@ -1,6 +1,8 @@
 gray(color, opacity = 1)
 	return rgba(color,color,color, opacity)
 
+toolbarWidth = 2em
+
 *
 	margin 0
 	padding 0
@@ -21,6 +23,9 @@ body
 	line-height 1.3
 	margin 0
 	padding 0
+
+.hidden
+	display none !important
 
 #wrapcontent
 	background-color gray(230)
@@ -53,7 +58,7 @@ h6
 	line-height 1.5
 	position relative
 	right 20px
-	&hover span
+	&:hover span
 		visibility visible
 	span
 		height 15px
@@ -177,25 +182,11 @@ dl
 		& > p
 			margin-bottom 0.5em
 
-article
-	ul, ol
-		margin-left 2em
-		margin-bottom 1em
-	ul ul,
-	ul ol,
-	ol ul,
-	ol ol
-		margin-bottom 0.4em
-
-	li
-		line-height 1.4
-		p
-			margin-bottom 0.5em
 
 blockquote
-	margin 0 2em
+	margin 0 2em 2em 2em
 	font-style italic
-	background-color gray(250)
+	background-color gray(240)
 	padding 1em
 	em
 		display block
@@ -222,22 +213,35 @@ article
 	vertical-align top
 	width 670px
 	padding 2em
+	padding-left 2em + toolbarWidth
+	ul, ol
+		margin-left 2em
+		margin-bottom 1em
+	ul ul,
+	ul ol,
+	ol ul,
+	ol ol
+		margin-bottom 0.4em
+
+	li
+		line-height 1.4
+		p
+			margin-bottom 0.5em
 
 #toolbar
-	width 30px
-	height 100%
 	display inline-block
+	height 100%
+	width toolbarWidth
 	vertical-align top
 	menu
 		position fixed
 		height 100%
-		width 30px
+		width toolbarWidth
 		overflow-y auto
-		padding 5px
 		background-color rgb(20,20,20)
 		button
-			height 20px
-			width 20px
+			height 1.5em
+			width 100%
 			color white
 			background-color transparent
 			cursor pointer
@@ -269,6 +273,7 @@ article
 
 
 	nav
+		background-color rgba(0,0,0,0.85)
 		position fixed
 		height 100%
 		-webkit-font-smoothing antialiased
@@ -276,7 +281,6 @@ article
 		line-height 0.8
 		width 250px
 		overflow-y auto
-		background-color rgb(50,50,50)
 		padding 50px 20px 20px 20px
 		font-family Arial, sans-serif
 		ul
@@ -319,3 +323,14 @@ article
 										font-size 64%
 	& > ul
 		margin-left 10px
+
+
+@media (max-width 800px)
+	#toc
+		display none
+
+	#wrapcontent
+		width 100%
+
+	article
+		width 100%
