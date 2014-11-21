@@ -81,30 +81,46 @@ module.exports = function (mdPath, port) {
 		}
 		else if (fileExtension === 'css') {
 
-			fs.readFile(
-				(__dirname + '/styl/screen.styl'),
-				'utf8',
-				function (err, stylusString) {
+			if(fs.existsSync(__dirname + uri))
+				fs.readFile(__dirname + uri, 'utf8', function (err, file) {
 
-					if (err) throw err
+					if (err) {
+						response.writeHead(500, {"Content-Type": "text/plain"})
+						response.write(err + "\n")
+					}
+					else {
+						response.writeHead(200, {"Content-Type": "text/css"})
+						response.write(file, "utf8")
+					}
 
-					stylus(stylusString)
-						//.set('compress', true)
-						//.use(nib())
-						//.import('nib')
-						//.define('url', stylus.url())
-						.import(__dirname + '/styl/tomorrow-night.styl')
-						.render(function (err, css) {
-
-							if (err) throw err
-
-							response.writeHead(200, {
-								"Content-Type": "text/css"
-							})
-							response.write(css.replace(/\n/g, ''))
-							response.end()
-						})
+					response.end()
 				})
+
+			else
+				fs.readFile(
+					(__dirname + '/styl/screen.styl'),
+					'utf8',
+					function (err, stylusString) {
+
+						if (err) throw err
+
+						stylus(stylusString)
+							//.set('compress', true)
+							//.use(nib())
+							//.import('nib')
+							//.define('url', stylus.url())
+							.import(__dirname + '/styl/tomorrow-night.styl')
+							.render(function (err, css) {
+
+								if (err) throw err
+
+								response.writeHead(200, {
+									"Content-Type": "text/css"
+								})
+								response.write(css.replace(/\n/g, ''))
+								response.end()
+							})
+					})
 		}
 		else if (fileExtension === 'js') {
 

@@ -7,7 +7,7 @@ var program = require('commander'),
     defaults = {
 	    port: 3000
     },
-    serveString = 'Serve index.md on http://localhost:%s',
+    serveString = 'Serve %s on http://localhost:%s',
     port
 
 
@@ -19,28 +19,27 @@ function list (val) {
 	return val.split(',')
 }
 
-function checkIfExists (file) {
-	return fs.readdirSync('.').indexOf('index.md') !== -1
-}
 
 program
 	.option('-p --port <n>', 'Set port [default: 3000]')
 
 
-
 program
 	.command('serve')
 	.description('Serve the markdown file on localhost.')
-	.action(function (name) {
+	.action(function (filePath) {
 
 		var port = program.port || defaults.port
 
-		if (typeof name === 'object')
+		if (typeof filePath === 'object')
 			console.log('Usage: serve [options ...] [file]')
 
+		else if (!fs.existsSync(filePath))
+			console.error(filePath + ' does not exist!')
+
 		else {
-			console.log(serveString, port)
-			mardow(name, port)
+			console.log(serveString, filePath, port)
+			mardow(filePath, port)
 		}
 	})
 
@@ -55,11 +54,11 @@ program.parse(process.argv)
 
 if (!program.args.length) {
 
-	if (checkIfExists('index.md')) {
+	if (fs.existsSync('index.md')) {
 
 		port = program.port || defaults.port
 
-		console.log(serveString, port)
+		console.log(serveString, 'index.md', port)
 
 		mardow('./index.md', port)
 	}
