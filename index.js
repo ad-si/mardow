@@ -231,31 +231,97 @@ function cssMiddleware (request, response) {
 	}
 }
 
+function markdownMiddleware (request, response) {
+
+	var uri = url.parse(request.url).pathname,
+		fileName = path.join(process.cwd(), uri),
+		fileExtension = fileName.split('.').pop(),
+		markdown = fs.readFileSync(request.mdFilePath, 'utf8'),
+		tokens = marked.lexer(markdown),
+		previousLevel = 0,
+		toc = [],
+		firstHeading = false,
+		stats = {
+			code: 0,
+			tables: 0,
+			images: 0,
+			paragraphs: 0
+		},
+		template
+
+
+	if (!fs.statSync(fileName).isDirectory())
+		return null
+
+	tokens.forEach(function (token) {
+
+		if (token.type === 'heading') {
+
+			var diff = token.depth - previousLevel
+
+			if (!firstHeading)
+				firstHeading = token.text
+
+
+			if (diff === 1) {
+				toc.push('<ul><li><a>' + token.text + '</a></li>')
+			}
+			else if (diff === 0) {
+				toc.push('<li><a>' + token.text + '</a></li>')
+			}
+			else if (diff <= -1) {
+
+				for (; diff < 0; diff++) {
+					toc.push('</ul></li>')
+				}
+
+				toc.push('<li><a href="#' + token.text + '">' +
+						 token.text + '</a></li>')
+			}
+
+			previousLevel = token.depth
+		}
+		if (token.type === 'code')
+			stats.code++
+		if (token.type === 'table')
+			stats.tables++
+		if (token.type === 'paragraph') {
+
+			stats.paragraphs++
+
+			// Omit paragraph if it only contains an image
+			if (token.text.match(/^!\[.*]\(.+\)$/g))
+				stats.paragraphs--
+		}
+	})
+
+	toc.push('</ul>')
+
+
+	marked(markdown, {}, function (err, content) {
+
+		if (err) throw err
+
+		response.writeHead(200, {
+			'Content-Type': 'text/html'
+		})
+		response.write(assembleDataObject({
+			markdown: markdown,
+			content: content,
+			firstHeading: firstHeading,
+			toc: toc,
+			stats: stats,
+			template: template
+		}), 'utf8')
+		response.end()
+	})
+
+	return true
+}
+
 function server (mdPath) {
 
 	return function (request, response) {
-
-		var uri = url.parse(request.url).pathname,
-			fileName = path.join(process.cwd(), uri),
-			fileExtension = fileName.split('.').pop(),
-			stats = {
-				code: 0,
-				tables: 0,
-				images: 0,
-				paragraphs: 0
-			},
-			tokens,
-			toc = [],
-			firstHeading = false,
-			allowedFileTypes = [
-				'css',
-				'ico',
-				'js'
-			],
-			isAllowedFileType = allowedFileTypes.indexOf(fileExtension) !== -1,
-			template,
-			markdown,
-			html
 
 		request.mdFilePath = mdPath
 
@@ -271,85 +337,14 @@ function server (mdPath) {
 		if (cssMiddleware(request, response))
 			return
 
-		if (fs.statSync(fileName).isDirectory()) {
-
-			markdown = fs.readFileSync(mdPath, 'utf8')
-			tokens = marked.lexer(markdown)
-
-			var previousLevel = 0
-
-			tokens.forEach(function (token) {
-
-				if (token.type === 'heading') {
-
-					var diff = token.depth - previousLevel
-
-					if (!firstHeading)
-						firstHeading = token.text
-
-
-					if (diff === 1) {
-						toc.push('<ul><li><a>' + token.text + '</a></li>')
-					}
-					else if (diff === 0) {
-						toc.push('<li><a>' + token.text + '</a></li>')
-					}
-					else if (diff <= -1) {
-
-						for (; diff < 0; diff++) {
-							toc.push('</ul></li>')
-						}
-
-						toc.push('<li><a href="#' + token.text + '">' +
-								 token.text + '</a></li>')
-					}
-
-					previousLevel = token.depth
-				}
-				if (token.type === 'code')
-					stats.code++
-				if (token.type === 'table')
-					stats.tables++
-				if (token.type === 'paragraph') {
-
-					stats.paragraphs++
-
-					// Omit paragraph if it only contains an image
-					if (token.text.match(/^!\[.*]\(.+\)$/g))
-						stats.paragraphs--
-				}
-
-			})
-
-			toc.push('</ul>')
-
-
-			marked(markdown, {}, function (err, content) {
-
-				if (err) throw err
-
-				response.writeHead(200, {
-					'Content-Type': 'text/html'
-				})
-				response.write(assembleDataObject({
-					markdown: markdown,
-					content: content,
-					firstHeading: firstHeading,
-					toc: toc,
-					stats: stats,
-					template: template
-				}), 'utf8')
-				response.end()
-			})
-		}
-		else if (!fs.existsSync(fileName)) {
-
-			response.writeHead(404, {'Content-Type': 'text/plain'})
-			response.write('404 Not Found\n')
-			response.end()
-
+		if (markdownMiddleware(request, response))
 			return
-		}
+
+
+		response.writeHead(404, {'Content-Type': 'text/plain'})
+		response.write('404 Not Found\n')
+		response.end()
+
 	}
 }
 
