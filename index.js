@@ -84,6 +84,69 @@ function assembleDataObject (passedData) {
 	return mustache.render(template, data)
 }
 
+function imageMiddleware (request, response) {
+
+	var uri = url.parse(request.url).pathname,
+		fileName = path.join(process.cwd(), uri),
+		fileExtension = fileName.split('.').pop(),
+		imageTypes = [
+			'gif',
+			'jpeg',
+			'jpg',
+			'png',
+			'svg'
+		],
+		isImage = imageTypes.indexOf(fileExtension) !== -1
+
+
+	if (isImage) {
+		fs.readFile(
+			path.dirname(request.mdFilePath) + uri,
+			function (err, file) {
+
+				var contentType
+
+				if (err) {
+					response.writeHead(500, {'Content-Type': 'text/plain'})
+					response.write(err + '\n')
+					response.end()
+				}
+				else {
+					contentType = 'image/' + fileExtension
+
+				if (fileExtension === 'svg')
+					contentType = 'svg+xml'
+
+					response.writeHead(200, {'Content-Type': contentType})
+					response.end(file, 'binary')
+				}
+			}
+		)
+		return true
+	}
+}
+
+
+function faviconMiddleware (request, response) {
+
+	var uri = url.parse(request.url).pathname,
+		fileName = path.join(process.cwd(), uri),
+		fileExtension = fileName.split('.').pop()
+
+
+	if (fileExtension === 'ico') {
+		fs.readFile(__dirname + '/img/favicon.png', function (err, file) {
+
+			if (err) throw err
+
+			response.writeHead(200, {'Content-Type': 'image/png'})
+			response.end(file, 'binary')
+		})
+		return true
+	}
+}
+
+
 function server (mdPath) {
 
 	return function (request, response) {
@@ -100,47 +163,25 @@ function server (mdPath) {
 			tokens,
 			toc = [],
 			firstHeading = false,
-			imageTypes = [
-				'gif',
-				'jpeg',
-				'jpg',
-				'png',
-				'svg'
-			],
 			allowedFileTypes = [
 				'css',
 				'ico',
 				'js'
 			],
-			isImage = imageTypes.indexOf(fileExtension) !== -1,
 			isAllowedFileType = allowedFileTypes.indexOf(fileExtension) !== -1,
 			template,
 			markdown,
 			html
 
+		request.mdFilePath = mdPath
 
-		if (!isImage &&
-			!isAllowedFileType &&
-			!fs.existsSync(fileName)) {
-
-			response.writeHead(404, {'Content-Type': 'text/plain'})
-			response.write('404 Not Found\n')
-			response.end()
-
+		if (faviconMiddleware(request, response))
 			return
-		}
 
+		if (imageMiddleware(request, response))
+			return
 
-		if (fileExtension === 'ico') {
-			fs.readFile(__dirname + '/img/favicon.png', function (err, file) {
-
-				if (err) throw err
-
-				response.writeHead(200, {'Content-Type': 'image/png'})
-				response.end(file, 'binary')
-			})
-		}
-		else if (fileExtension === 'css') {
+		if (fileExtension === 'css') {
 
 			if(fs.existsSync(__dirname + uri))
 				fs.readFile(__dirname + uri, 'utf8', function (err, file) {
@@ -200,28 +241,6 @@ function server (mdPath) {
 				}
 
 				response.end()
-			})
-		}
-		else if (isImage) {
-
-			fs.readFile(path.dirname(mdPath) + uri, function (err, file) {
-
-				var contentType
-
-				if (err) {
-					response.writeHead(500, {'Content-Type': 'text/plain'})
-					response.write(err + '\n')
-					response.end()
-				}
-				else {
-					contentType = 'image/' + fileExtension
-
-				if (fileExtension === 'svg')
-					contentType = 'svg+xml'
-
-					response.writeHead(200, {'Content-Type': contentType})
-					response.end(file, 'binary')
-				}
 			})
 		}
 		else if (fs.statSync(fileName).isDirectory()) {
@@ -294,6 +313,14 @@ function server (mdPath) {
 				}), 'utf8')
 				response.end()
 			})
+		}
+		else if (!fs.existsSync(fileName)) {
+
+			response.writeHead(404, {'Content-Type': 'text/plain'})
+			response.write('404 Not Found\n')
+			response.end()
+
+			return
 		}
 	}
 }
