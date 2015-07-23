@@ -126,7 +126,6 @@ function imageMiddleware (request, response) {
 	}
 }
 
-
 function faviconMiddleware (request, response) {
 
 	var uri = url.parse(request.url).pathname,
@@ -142,6 +141,38 @@ function faviconMiddleware (request, response) {
 			response.writeHead(200, {'Content-Type': 'image/png'})
 			response.end(file, 'binary')
 		})
+		return true
+	}
+}
+
+function javascriptMiddleware (request, response) {
+
+	var uri = url.parse(request.url).pathname,
+		fileName = path.join(process.cwd(), uri),
+		fileExtension = fileName.split('.').pop()
+
+
+	if (fileExtension === 'js') {
+		fs.readFile(
+			path.join(__dirname, uri),
+			'utf8',
+			function (err, file) {
+
+				if (err) {
+					response.writeHead(500, {'Content-Type': 'text/plain'})
+					response.write(err + '\n')
+				}
+				else {
+					response.writeHead(
+						200,
+						{'Content-Type': 'application/x-javascript'}
+					)
+					response.write(file, 'utf8')
+				}
+
+				response.end()
+			}
+		)
 		return true
 	}
 }
@@ -179,6 +210,9 @@ function server (mdPath) {
 			return
 
 		if (imageMiddleware(request, response))
+			return
+
+		if (javascriptMiddleware(request, response))
 			return
 
 		if (fileExtension === 'css') {
@@ -223,25 +257,6 @@ function server (mdPath) {
 								response.end()
 							})
 					})
-		}
-		else if (fileExtension === 'js') {
-
-			fs.readFile(__dirname + uri, 'utf8', function (err, file) {
-
-				if (err) {
-					response.writeHead(500, {'Content-Type': 'text/plain'})
-					response.write(err + '\n')
-				}
-				else {
-					response.writeHead(
-						200,
-						{'Content-Type': 'application/x-javascript'}
-					)
-					response.write(file, 'utf8')
-				}
-
-				response.end()
-			})
 		}
 		else if (fs.statSync(fileName).isDirectory()) {
 
