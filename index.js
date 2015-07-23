@@ -177,6 +177,59 @@ function javascriptMiddleware (request, response) {
 	}
 }
 
+function cssMiddleware (request, response) {
+
+	var uri = url.parse(request.url).pathname,
+		fileName = path.join(process.cwd(), uri),
+		fileExtension = fileName.split('.').pop()
+
+
+	if (fileExtension === 'css') {
+
+		if(fs.existsSync(__dirname + uri))
+			fs.readFile(__dirname + uri, 'utf8', function (err, file) {
+
+				if (err) {
+					response.writeHead(500, {'Content-Type': 'text/plain'})
+					response.write(err + '\n')
+				}
+				else {
+					response.writeHead(200, {'Content-Type': 'text/css'})
+					response.write(file, 'utf8')
+				}
+
+				response.end()
+			})
+
+		else
+			fs.readFile(
+				(__dirname + '/styl/screen.styl'),
+				'utf8',
+				function (err, stylusString) {
+
+					if (err) throw err
+
+					stylus(stylusString)
+						//.set('compress', true)
+						//.use(nib())
+						//.import('nib')
+						//.define('url', stylus.url())
+						.import(__dirname + '/styl/tomorrow-night.styl')
+						.render(function (err, css) {
+
+							if (err) throw err
+
+							response.writeHead(200, {
+								'Content-Type': 'text/css'
+							})
+							response.write(css.replace(/\n/g, ''))
+							response.end()
+						})
+				})
+
+		return true
+	}
+}
 
 function server (mdPath) {
 
@@ -215,50 +268,10 @@ function server (mdPath) {
 		if (javascriptMiddleware(request, response))
 			return
 
-		if (fileExtension === 'css') {
+		if (cssMiddleware(request, response))
+			return
 
-			if(fs.existsSync(__dirname + uri))
-				fs.readFile(__dirname + uri, 'utf8', function (err, file) {
-
-					if (err) {
-						response.writeHead(500, {'Content-Type': 'text/plain'})
-						response.write(err + '\n')
-					}
-					else {
-						response.writeHead(200, {'Content-Type': 'text/css'})
-						response.write(file, 'utf8')
-					}
-
-					response.end()
-				})
-
-			else
-				fs.readFile(
-					(__dirname + '/styl/screen.styl'),
-					'utf8',
-					function (err, stylusString) {
-
-						if (err) throw err
-
-						stylus(stylusString)
-							//.set('compress', true)
-							//.use(nib())
-							//.import('nib')
-							//.define('url', stylus.url())
-							.import(__dirname + '/styl/tomorrow-night.styl')
-							.render(function (err, css) {
-
-								if (err) throw err
-
-								response.writeHead(200, {
-									'Content-Type': 'text/css'
-								})
-								response.write(css.replace(/\n/g, ''))
-								response.end()
-							})
-					})
-		}
-		else if (fs.statSync(fileName).isDirectory()) {
+		if (fs.statSync(fileName).isDirectory()) {
 
 			markdown = fs.readFileSync(mdPath, 'utf8')
 			tokens = marked.lexer(markdown)
