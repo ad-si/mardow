@@ -32,6 +32,58 @@ function removePunctuation (word) {
 	return word.replace(/['";:,.\/?\\-]/g, '')
 }
 
+function assembleDataObject (passedData) {
+
+	var markdown = passedData.markdown,
+		content = passedData.content,
+		firstHeading = passedData.firstHeading,
+		toc = passedData.toc,
+		stats = passedData.stats,
+		template = passedData.template,
+
+		images = markdown.match(/!\[.*]\(.+\)/g),
+		words = markdown
+			.split(/\s/g)
+			.filter(wordFilter)
+			.map(removePunctuation),
+		data = {}
+
+	//TODO: wordHistogram(words)
+
+	data.title = firstHeading
+	data.toc = toc.join('')
+	data.content = content
+
+	data.lines = markdown
+		.split(/\n/g)
+		.filter(function (n) {
+			return n !== ''
+		})
+		.length
+	data.allLines = markdown.split('\n').length
+	data.words = words.filter(wordFilter).length
+	data.allWords = markdown
+		.split(/\s/g)
+		.filter(function (n) {
+			return n !== ''
+		})
+		.length
+	data.chars = markdown.length
+	data.images = images ? images.length : 0
+	data.code = stats.code
+	data.tables = stats.tables
+	data.paragraphs = stats.paragraphs
+	data.math = markdown.split('´').length - 1
+
+
+	template = fs.readFileSync(
+		path.join(__dirname, '/templates/index.html'),
+		'utf8'
+	)
+
+	return mustache.render(template, data)
+}
+
 function server (mdPath) {
 
 	return function (request, response) {
@@ -62,7 +114,6 @@ function server (mdPath) {
 			],
 			isImage = imageTypes.indexOf(fileExtension) !== -1,
 			isAllowedFileType = allowedFileTypes.indexOf(fileExtension) !== -1,
-			data = {},
 			template,
 			markdown,
 			html
@@ -230,50 +281,17 @@ function server (mdPath) {
 
 				if (err) throw err
 
-				var images = markdown.match(/!\[.*]\(.+\)/g),
-					words = markdown
-						.split(/\s/g)
-						.filter(wordFilter)
-						.map(removePunctuation)
-
-				//TODO: wordHistogram(words)
-
-				data.title = firstHeading
-				data.toc = toc.join('')
-				data.content = content
-
-				data.lines = markdown
-					.split(/\n/g)
-					.filter(function (n) {
-						return n !== ''
-					})
-					.length
-				data.allLines = markdown.split('\n').length
-				data.words = words.filter(wordFilter).length
-				data.allWords = markdown
-					.split(/\s/g)
-					.filter(function (n) {
-						return n !== ''
-					})
-					.length
-				data.chars = markdown.length
-				data.images = images ? images.length : 0
-				data.code = stats.code
-				data.tables = stats.tables
-				data.paragraphs = stats.paragraphs
-				data.math = markdown.split('´').length - 1
-
-
-				template = fs.readFileSync(
-					path.join(__dirname, '/templates/index.html'),
-					'utf8'
-				)
-				html = mustache.render(template, data)
-
 				response.writeHead(200, {
 					'Content-Type': 'text/html'
 				})
-				response.write(html, 'utf8')
+				response.write(assembleDataObject({
+					markdown: markdown,
+					content: content,
+					firstHeading: firstHeading,
+					toc: toc,
+					stats: stats,
+					template: template
+				}), 'utf8')
 				response.end()
 			})
 		}
