@@ -23,18 +23,18 @@ marked.setOptions({
 	langPrefix: 'lang-'
 })
 
-module.exports = function (mdPath, port) {
 
-	var data = {},
-		template,
-		markdown,
-		html,
-		server
+function wordFilter (n) {
+	return n !== '' && n.length !== 1
+}
 
+function removePunctuation (word) {
+	return word.replace(/['";:,.\/?\\-]/g, '')
+}
 
-	//stylusString = fs.readFileSync(__dirname + '/styl/screen.styl', 'utf8'),
+function server (mdPath) {
 
-	server = function (request, response) {
+	return function (request, response) {
 
 		var uri = url.parse(request.url).pathname,
 			fileName = path.join(process.cwd(), uri),
@@ -61,7 +61,12 @@ module.exports = function (mdPath, port) {
 				'js'
 			],
 			isImage = imageTypes.indexOf(fileExtension) !== -1,
-			isAllowedFileType = allowedFileTypes.indexOf(fileExtension) !== -1
+			isAllowedFileType = allowedFileTypes.indexOf(fileExtension) !== -1,
+			data = {},
+			template,
+			markdown,
+			html
+
 
 		if (!isImage &&
 			!isAllowedFileType &&
@@ -150,6 +155,8 @@ module.exports = function (mdPath, port) {
 
 			fs.readFile(path.dirname(mdPath) + uri, function (err, file) {
 
+				var contentType
+
 				if (err) {
 					response.writeHead(500, {'Content-Type': 'text/plain'})
 					response.write(err + '\n')
@@ -218,14 +225,6 @@ module.exports = function (mdPath, port) {
 
 			toc.push('</ul>')
 
-			function wordFilter (n) {
-				return n !== '' && n.length !== 1
-			}
-
-			function removePunctuation (word) {
-				return word.replace(/['";:,.\/?\\-]/g, '')
-			}
-
 
 			marked(markdown, {}, function (err, content) {
 
@@ -279,9 +278,14 @@ module.exports = function (mdPath, port) {
 			})
 		}
 	}
+}
 
+
+module.exports = function (mdPath, port) {
+
+	//stylusString = fs.readFileSync(__dirname + '/styl/screen.styl', 'utf8'),
 
 	http
-		.createServer(server)
+		.createServer(server(mdPath))
 		.listen(port)
 }
