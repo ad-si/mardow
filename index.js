@@ -1,10 +1,12 @@
+'use strict'
+
 var marked = require('marked'),
-    fs = require('fs'),
-    url = require('url'),
-    path = require('path'),
-    mustache = require('mustache'),
-    http = require('http'),
-    stylus = require('stylus')
+	fs = require('fs'),
+	url = require('url'),
+	path = require('path'),
+	mustache = require('mustache'),
+	http = require('http'),
+	stylus = require('stylus')
 
 
 /** Please stop reading!
@@ -22,10 +24,10 @@ marked.setOptions({
 module.exports = function (mdPath, port) {
 
 	var data = {},
-	    template,
-	    markdown,
-	    html,
-	    server
+		template,
+		markdown,
+		html,
+		server
 
 
 	//stylusString = fs.readFileSync(__dirname + '/styl/screen.styl', 'utf8'),
@@ -33,37 +35,38 @@ module.exports = function (mdPath, port) {
 	server = function (request, response) {
 
 		var uri = url.parse(request.url).pathname,
-		    fileName = path.join(process.cwd(), uri),
-		    fileExtension = fileName.split('.').pop(),
-		    stats = {
-			    code: 0,
-			    tables: 0,
-			    images: 0,
-			    paragraphs: 0
-		    },
-		    tokens,
-		    toc = [],
-		    firstHeading = false,
-		    imageTypes = [
-			    'png',
-			    'gif',
-			    'jpeg',
-			    'jpg'
-		    ],
-		    allowedFileTypes = [
-			    'css',
-			    'ico',
-			    'js'
-		    ],
-		    isImage = imageTypes.indexOf(fileExtension) != -1,
-			isAllowedFileType = allowedFileTypes.indexOf(fileExtension) != -1
+			fileName = path.join(process.cwd(), uri),
+			fileExtension = fileName.split('.').pop(),
+			stats = {
+				code: 0,
+				tables: 0,
+				images: 0,
+				paragraphs: 0
+			},
+			tokens,
+			toc = [],
+			firstHeading = false,
+			imageTypes = [
+				'gif',
+				'jpeg',
+				'jpg',
+				'png',
+				'svg'
+			],
+			allowedFileTypes = [
+				'css',
+				'ico',
+				'js'
+			],
+			isImage = imageTypes.indexOf(fileExtension) !== -1,
+			isAllowedFileType = allowedFileTypes.indexOf(fileExtension) !== -1
 
 		if (!isImage &&
-		    !isAllowedFileType &&
-		    !fs.existsSync(fileName)) {
+			!isAllowedFileType &&
+			!fs.existsSync(fileName)) {
 
-			response.writeHead(404, {"Content-Type": "text/plain"})
-			response.write("404 Not Found\n")
+			response.writeHead(404, {'Content-Type': 'text/plain'})
+			response.write('404 Not Found\n')
 			response.end()
 
 			return
@@ -75,7 +78,7 @@ module.exports = function (mdPath, port) {
 
 				if (err) throw err
 
-				response.writeHead(200, {"Content-Type": "image/png"})
+				response.writeHead(200, {'Content-Type': 'image/png'})
 				response.end(file, 'binary')
 			})
 		}
@@ -85,12 +88,12 @@ module.exports = function (mdPath, port) {
 				fs.readFile(__dirname + uri, 'utf8', function (err, file) {
 
 					if (err) {
-						response.writeHead(500, {"Content-Type": "text/plain"})
-						response.write(err + "\n")
+						response.writeHead(500, {'Content-Type': 'text/plain'})
+						response.write(err + '\n')
 					}
 					else {
-						response.writeHead(200, {"Content-Type": "text/css"})
-						response.write(file, "utf8")
+						response.writeHead(200, {'Content-Type': 'text/css'})
+						response.write(file, 'utf8')
 					}
 
 					response.end()
@@ -115,7 +118,7 @@ module.exports = function (mdPath, port) {
 								if (err) throw err
 
 								response.writeHead(200, {
-									"Content-Type": "text/css"
+									'Content-Type': 'text/css'
 								})
 								response.write(css.replace(/\n/g, ''))
 								response.end()
@@ -127,12 +130,15 @@ module.exports = function (mdPath, port) {
 			fs.readFile(__dirname + uri, 'utf8', function (err, file) {
 
 				if (err) {
-					response.writeHead(500, {"Content-Type": "text/plain"})
-					response.write(err + "\n")
+					response.writeHead(500, {'Content-Type': 'text/plain'})
+					response.write(err + '\n')
 				}
 				else {
-					response.writeHead(200, {"Content-Type": "application/x-javascript"})
-					response.write(file, "utf8")
+					response.writeHead(
+						200,
+						{'Content-Type': 'application/x-javascript'}
+					)
+					response.write(file, 'utf8')
 				}
 
 				response.end()
@@ -143,12 +149,17 @@ module.exports = function (mdPath, port) {
 			fs.readFile(path.dirname(mdPath) + uri, function (err, file) {
 
 				if (err) {
-					response.writeHead(500, {"Content-Type": "text/plain"})
-					response.write(err + "\n")
+					response.writeHead(500, {'Content-Type': 'text/plain'})
+					response.write(err + '\n')
 					response.end()
 				}
 				else {
-					response.writeHead(200, {"Content-Type": "image/" + fileExtension})
+					contentType = 'image/' + fileExtension
+
+				if (fileExtension === 'svg')
+					contentType = 'svg+xml'
+
+					response.writeHead(200, {'Content-Type': contentType})
 					response.end(file, 'binary')
 				}
 			})
@@ -183,7 +194,7 @@ module.exports = function (mdPath, port) {
 						}
 
 						toc.push('<li><a href="#' + token.text + '">' +
-						         token.text + '</a></li>')
+								 token.text + '</a></li>')
 					}
 
 					previousLevel = token.depth
@@ -216,8 +227,8 @@ module.exports = function (mdPath, port) {
 			function wordHistogram (words) {
 
 				var histogram = [],
-				    dict = {},
-				    i = 1
+					dict = {},
+					i = 1
 
 				words.forEach(function (word) {
 
@@ -253,10 +264,10 @@ module.exports = function (mdPath, port) {
 				if (err) throw err
 
 				var images = markdown.match(/!\[.*]\(.+\)/g),
-				    words = markdown
-					    .split(/\s/g)
-					    .filter(wordFilter)
-					    .map(removePunctuation)
+					words = markdown
+						.split(/\s/g)
+						.filter(wordFilter)
+						.map(removePunctuation)
 
 				//TODO: wordHistogram(words)
 
@@ -283,17 +294,17 @@ module.exports = function (mdPath, port) {
 				data.code = stats.code
 				data.tables = stats.tables
 				data.paragraphs = stats.paragraphs
-				data.math = markdown.split("´").length - 1
+				data.math = markdown.split('´').length - 1
 
 
 				template = fs.readFileSync(__dirname +
-				                           '/templates/index.html', 'utf8')
+										   '/templates/index.html', 'utf8')
 				html = mustache.render(template, data)
 
 				response.writeHead(200, {
-					"Content-Type": "text/html"
+					'Content-Type': 'text/html'
 				})
-				response.write(html, "utf8")
+				response.write(html, 'utf8')
 				response.end()
 			})
 		}
