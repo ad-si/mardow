@@ -6,7 +6,9 @@ var marked = require('marked'),
 	path = require('path'),
 	mustache = require('mustache'),
 	http = require('http'),
-	stylus = require('stylus')
+	stylus = require('stylus'),
+
+	wordHistogram = require('./source/word-histogram')
 
 
 /** Please stop reading!
@@ -224,40 +226,6 @@ module.exports = function (mdPath, port) {
 				return word.replace(/['";:,.\/?\\-]/g, '')
 			}
 
-			function wordHistogram (words) {
-
-				var histogram = [],
-					dict = {},
-					i = 1
-
-				words.forEach(function (word) {
-
-					if (dict.hasOwnProperty(word))
-						dict[word] = Number(dict[word]) + 1
-					else
-						dict[word] = 1
-				})
-
-
-				for (var word in dict)
-					if (dict.hasOwnProperty(word)) {
-						histogram.push({
-							nr: i,
-							word: word,
-							count: dict[word]
-						})
-
-						i++
-					}
-
-				histogram
-					.sort(function (a, b) {
-						return a.count - b.count
-					})
-
-				return histogram
-			}
-
 
 			marked(markdown, {}, function (err, content) {
 
@@ -297,8 +265,10 @@ module.exports = function (mdPath, port) {
 				data.math = markdown.split('´').length - 1
 
 
-				template = fs.readFileSync(__dirname +
-										   '/templates/index.html', 'utf8')
+				template = fs.readFileSync(
+					path.join(__dirname, '/templates/index.html'),
+					'utf8'
+				)
 				html = mustache.render(template, data)
 
 				response.writeHead(200, {
