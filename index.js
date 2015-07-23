@@ -247,10 +247,19 @@ function markdownMiddleware (request, response) {
 			images: 0,
 			paragraphs: 0
 		},
-		template
+		template,
+		inode
 
 
-	if (!fs.statSync(fileName).isDirectory())
+	try {
+		inode = fs.statSync(fileName)
+	}
+	catch (error) {
+		if (error.code !== 'ENOENT')
+			throw error
+	}
+
+	if (!inode || !inode.isDirectory())
 		return null
 
 	tokens.forEach(function (token) {
@@ -319,6 +328,14 @@ function markdownMiddleware (request, response) {
 	return true
 }
 
+function errorMiddleware (request, response) {
+
+	response.writeHead(404, {'Content-Type': 'text/plain'})
+	response.write('404 Not Found\n')
+	response.end()
+}
+
+
 function server (mdPath) {
 
 	return function (request, response) {
@@ -340,11 +357,7 @@ function server (mdPath) {
 		if (markdownMiddleware(request, response))
 			return
 
-
-		response.writeHead(404, {'Content-Type': 'text/plain'})
-		response.write('404 Not Found\n')
-		response.end()
-
+		errorMiddleware(request, response)
 	}
 }
 
