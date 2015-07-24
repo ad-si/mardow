@@ -84,6 +84,26 @@ function assembleDataObject (passedData) {
 	return mustache.render(template, data)
 }
 
+function insertIncludes (markdown, filePath) {
+
+	var includeSection
+
+	while (includeSection = markdown.match(/\<\!--include (.+)--\>/i)) {
+		markdown = markdown.replace(
+			includeSection[0],
+			fs.readFileSync(
+				path.resolve(
+					filePath,
+					'..',
+					includeSection[1] + '.md'
+				)
+			)
+		)
+	}
+
+	return markdown
+}
+
 function imageMiddleware (request, response) {
 
 	var uri = url.parse(request.url).pathname,
@@ -237,7 +257,7 @@ function markdownMiddleware (request, response) {
 		fileName = path.join(process.cwd(), uri),
 		fileExtension = fileName.split('.').pop(),
 		markdown = fs.readFileSync(request.mdFilePath, 'utf8'),
-		tokens = marked.lexer(markdown),
+		tokens,
 		previousLevel = 0,
 		toc = [],
 		firstHeading = false,
@@ -248,7 +268,8 @@ function markdownMiddleware (request, response) {
 			paragraphs: 0
 		},
 		template,
-		inode
+		inode,
+		includeSection
 
 
 	try {
@@ -261,6 +282,11 @@ function markdownMiddleware (request, response) {
 
 	if (!inode || !inode.isDirectory())
 		return null
+
+	markdown = insertIncludes(markdown, request.mdFilePath)
+
+	tokens = marked.lexer(markdown)
+
 
 	tokens.forEach(function (token) {
 
