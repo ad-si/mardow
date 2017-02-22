@@ -1,36 +1,33 @@
-'use strict'
+module.exports = words => {
+  const histogram = []
+  const dict = {}
+  let index = 1
 
-module.exports = function (words) {
-
-	var histogram = [],
-		dict = {},
-		i = 1,
-		word
-
-	words.forEach(function (word) {
-
-		if (dict.hasOwnProperty(word))
-			dict[word] = Number(dict[word]) + 1
-		else
-			dict[word] = 1
-	})
+  words.forEach(word => {
+    if (dict.hasOwnProperty(word)) {
+      dict[word] = Number(dict[word]) + 1
+    }
+    else {
+      dict[word] = 1
+    }
+  })
 
 
-	for (word in dict)
-		if (dict.hasOwnProperty(word)) {
-			histogram.push({
-				nr: i,
-				word: word,
-				count: dict[word]
-			})
+  for (const word in dict) {
+    if (!dict.hasOwnProperty(word)) return
+    histogram.push({
+      nr: index,
+      word,
+      count: dict[word],
+    })
 
-			i++
-		}
+    index++
+  }
 
-	histogram
-		.sort(function (a, b) {
-			return a.count - b.count
-		})
+  histogram
+    .sort((valueA, valueB) => {
+      return valueA.count - valueB.count
+    })
 
-	return histogram
+  return histogram
 }
