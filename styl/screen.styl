@@ -1,52 +1,52 @@
 gray(color, opacity = 1)
-	return rgba(color,color,color, opacity)
+  return rgba(color,color,color, opacity)
 
 toolbarWidth = 2em
 
 *
-	margin 0
-	padding 0
-	font-size 100%
-	box-sizing border-box
-	border none
+  margin 0
+  padding 0
+  font-size 100%
+  box-sizing border-box
+  border none
 
 html
-	height 100%
-	overflow-x hidden
+  height 100%
+  overflow-x hidden
 
 body
-	color gray(50)
-	height 100%
-	overflow-x hidden
-	font-size 14px
-	font-family "Helvetica", sans-serif
-	line-height 1.3
-	margin 0
-	padding 0
+  color gray(50)
+  height 100%
+  overflow-x hidden
+  font-size 14px
+  font-family "Helvetica", sans-serif
+  line-height 1.3
+  margin 0
+  padding 0
 
 .hidden
-	display none !important
+  display none !important
 
 #wrapcontent
-	background-color gray(230)
-	min-height 100%
-	margin auto
-	width 960px
+  background-color gray(230)
+  min-height 100%
+  margin auto
+  width 960px
 
 body,
 p,
 td,
 div
-	word-wrap break-word
+  word-wrap break-word
 
 p
-	text-align justify
-	-webkit-hyphens auto
-	-moz-hyphens auto
-	hyphens auto
-	margin-bottom 1em
-	+ p
-		margin-top -0.4em
+  text-align justify
+  -webkit-hyphens auto
+  -moz-hyphens auto
+  hyphens auto
+  margin-bottom 1em
+  + p
+    margin-top -0.4em
 
 h1,
 h2,
@@ -54,285 +54,285 @@ h3,
 h4,
 h5,
 h6
-	font-family Arial, Verdana, sans-serif
-	line-height 1.5
-	position relative
-	right 20px
-	&:hover span
-		visibility visible
-	span
-		height 15px
-		width 15px
-		font-size 15px
-		margin-right 5px
-		cursor pointer
-		visibility hidden
+  font-family Arial, Verdana, sans-serif
+  line-height 1.5
+  position relative
+  right 20px
+  &:hover span
+    visibility visible
+  span
+    height 15px
+    width 15px
+    font-size 15px
+    margin-right 5px
+    cursor pointer
+    visibility hidden
 
 h1
-	color black
-	font-size 200%
-	margin 0.65em 0
+  color black
+  font-size 200%
+  margin 0.65em 0
 
 h2
-	color #111
-	font-size 160%
-	margin .875em 0
+  color #111
+  font-size 160%
+  margin .875em 0
 
 h3
-	color #111
-	font-size 140%
-	margin 1em 0
+  color #111
+  font-size 140%
+  margin 1em 0
 
 h4
-	color #111
-	font-size 120%
-	margin 1.17em 0
+  color #111
+  font-size 120%
+  margin 1.17em 0
 
 h5
-	color #111
-	font-size 110%
-	margin 1.3em 0
+  color #111
+  font-size 110%
+  margin 1.3em 0
 
 h6
-	font-size 100%
-	margin 1.5em 0
+  font-size 100%
+  margin 1.5em 0
 
 a
-	-webkit-transition-color 0.1s ease-in-out
-	transition-color 0.1s ease-in-out
-	color #0d6ea1
-	text-decoration none
-	cursor pointer
-	&hover
-		color #3593d9
+  -webkit-transition-color 0.1s ease-in-out
+  transition-color 0.1s ease-in-out
+  color #0d6ea1
+  text-decoration none
+  cursor pointer
+  &hover
+    color #3593d9
 
 img
-	max-width 100%
-	max-height 500px
-	padding 1em
-	background-color white
-	box-shadow 1px 1px 2px rgba(0,0,0,0.2)
+  max-width 100%
+  max-height 500px
+  padding 1em
+  background-color white
+  box-shadow 1px 1px 2px rgba(0,0,0,0.2)
 
 figure
-	margin-bottom 2em
+  margin-bottom 2em
 
 figcaption
-	font-style italic
+  font-style italic
 
 mark
-	display inline-block
-	padding 1em
-	background-color rgb(250,210,0)
+  display inline-block
+  padding 1em
+  background-color rgb(250,210,0)
 
 pre
-	margin-bottom 1em
-	background-color rgb(29, 31, 33) !important
-	code
-		font-size 0.85em
-		white-space pre
-		-webkit-font-smoothing subpixel-antialiased
-		font-smoothing subpixel-antialiased
+  margin-bottom 1em
+  background-color rgb(29, 31, 33) !important
+  code
+    font-size 0.85em
+    white-space pre
+    -webkit-font-smoothing subpixel-antialiased
+    font-smoothing subpixel-antialiased
 
 code
-	margin 0 2px
-	padding 0 5px
-	display inline-block
-	color white
-	white-space nowrap
-	text-justify none
-	background-color gray(50)
-	border-radius 2px
-	font-family monospace
-	font-size 0.85em
-	font-weight 100
-	-webkit-font-smoothing antialiased
-	font-smoothing antialiased
+  margin 0 2px
+  padding 0 5px
+  display inline-block
+  color white
+  white-space nowrap
+  text-justify none
+  background-color gray(50)
+  border-radius 2px
+  font-family monospace
+  font-size 0.85em
+  font-weight 100
+  -webkit-font-smoothing antialiased
+  font-smoothing antialiased
 
 
 table
-	border-collapse collapse
-	margin-bottom 2em
-	caption
-		font-family sans-serif
-		margin-bottom 1em
-		font-weight 900
-		font-size 1.2em
-	thead
-		border-bottom 2px solid rgb(180,180,180)
-	tr
-		&:nth-of-type(2n)
-			background-color rgba(0,0,0,0.05)
-		&:nth-of-type(2n + 1)
-				background-color rgba(0,0,0,0)
-	th
-		background-color rgba(0,0,0,0.05)
-		font-family sans-serif
-		&:empty
-			display none
-	th, td
-		padding 0.2em 0.4em
-		border 1px solid rgb(180,180,180)
+  border-collapse collapse
+  margin-bottom 2em
+  caption
+    font-family sans-serif
+    margin-bottom 1em
+    font-weight 900
+    font-size 1.2em
+  thead
+    border-bottom 2px solid rgb(180,180,180)
+  tr
+    &:nth-of-type(2n)
+      background-color rgba(0,0,0,0.05)
+    &:nth-of-type(2n + 1)
+        background-color rgba(0,0,0,0)
+  th
+    background-color rgba(0,0,0,0.05)
+    font-family sans-serif
+    &:empty
+      display none
+  th, td
+    padding 0.2em 0.4em
+    border 1px solid rgb(180,180,180)
 
 dl
-	margin-bottom 2em
-	dt
-		font-weight 900
-		margin-bottom 0.5em
-		font-family sans-serif
-	dd
-		margin-left 1em
-		& > p
-			margin-bottom 0.5em
+  margin-bottom 2em
+  dt
+    font-weight 900
+    margin-bottom 0.5em
+    font-family sans-serif
+  dd
+    margin-left 1em
+    & > p
+      margin-bottom 0.5em
 
 
 blockquote
-	margin 0 2em 2em 2em
-	font-style italic
-	background-color gray(240)
-	padding 1em
-	em
-		display block
-		color rgb(100,100,100)
-		font-size 0.8em
-		font-style normal
-		text-align right
-		margin-top 0.8em
-		/*&before
-			content "\a"
-			white-space pre
-		*/
+  margin 0 2em 2em 2em
+  font-style italic
+  background-color gray(240)
+  padding 1em
+  em
+    display block
+    color rgb(100,100,100)
+    font-size 0.8em
+    font-style normal
+    text-align right
+    margin-top 0.8em
+    /*&before
+      content "\a"
+      white-space pre
+    */
 dd + dt
-	margin-top 1.5em
+  margin-top 1.5em
 
 hr
-	background-color gray(100)
-	height 1px
-	border none
+  background-color gray(100)
+  height 1px
+  border none
 
 
 article
-	display inline-block
-	vertical-align top
-	width 670px
-	padding 2em
-	padding-left 2em + toolbarWidth
-	ul, ol
-		margin-left 2em
-		margin-bottom 1em
-	ul ul,
-	ul ol,
-	ol ul,
-	ol ol
-		margin-bottom 0.4em
+  display inline-block
+  vertical-align top
+  width 670px
+  padding 2em
+  padding-left 2em + toolbarWidth
+  ul, ol
+    margin-left 2em
+    margin-bottom 1em
+  ul ul,
+  ul ol,
+  ol ul,
+  ol ol
+    margin-bottom 0.4em
 
-	li
-		line-height 1.4
-		p
-			margin-bottom 0.5em
+  li
+    line-height 1.4
+    p
+      margin-bottom 0.5em
 
 #toolbar
-	display inline-block
-	height 100%
-	width toolbarWidth
-	vertical-align top
-	menu
-		position fixed
-		height 100%
-		width toolbarWidth
-		overflow-y auto
-		background-color rgb(20,20,20)
-		button
-			height 1.5em
-			width 100%
-			color white
-			background-color transparent
-			cursor pointer
+  display inline-block
+  height 100%
+  width toolbarWidth
+  vertical-align top
+  menu
+    position fixed
+    height 100%
+    width toolbarWidth
+    overflow-y auto
+    background-color rgb(20,20,20)
+    button
+      height 1.5em
+      width 100%
+      color white
+      background-color transparent
+      cursor pointer
 
 #toc
-	height 100%
-	display inline-block
-	vertical-align top
-	width 250px
-	overflow-y auto
-	menu
-		position absolute
-		width 250px
-		top 0
-		z-index 1000
-		background-color rgb(30,30,30)
-		padding 5px
-		button
-			height 20px
-			padding 0 5px
-			border-radius 2px
-			background-color rgb(50,50,50)
-			color rgb(200,200,200)
-			font-size 0.8em
-			cursor pointer
-			margin-right 5px
-			&active
-				background-color rgb(80,80,80)
+  height 100%
+  display inline-block
+  vertical-align top
+  width 250px
+  overflow-y auto
+  menu
+    position absolute
+    width 250px
+    top 0
+    z-index 1000
+    background-color rgb(30,30,30)
+    padding 5px
+    button
+      height 20px
+      padding 0 5px
+      border-radius 2px
+      background-color rgb(50,50,50)
+      color rgb(200,200,200)
+      font-size 0.8em
+      cursor pointer
+      margin-right 5px
+      &active
+        background-color rgb(80,80,80)
 
 
-	nav
-		background-color rgba(0,0,0,0.85)
-		position fixed
-		height 100%
-		-webkit-font-smoothing antialiased
-		font-smoothing antialiased
-		line-height 0.8
-		width 250px
-		overflow-y auto
-		padding 50px 20px 20px 20px
-		font-family Arial, sans-serif
-		ul
-			list-style none
-			margin 0 0 0.6em 0.8em
-		> ul
-			margin-left 0
-		ul
-			li
-				margin-bottom 0.4em
-				a
-					color rgb(100, 200, 250)
-					font-weight 900
-					font-size 80%
-			ul
-				li
-					a
-						color rgb(150, 250, 200)
-						font-weight 500
-						font-size 76%
-				ul
-					li
-						a
-							color rgb(200, 250, 150)
-							font-size 72%
-					ul
-						li
-							a
-								color rgb(250, 200, 150)
-								font-size 68%
-						ul
-							li
-								a
-									color rgb(250, 150, 200)
-									font-size 64%
-							ul
-								li
-									a
-										color rgb(200, 150, 250)
-										font-size 64%
-	& > ul
-		margin-left 10px
+  nav
+    background-color rgba(0,0,0,0.85)
+    position fixed
+    height 100%
+    -webkit-font-smoothing antialiased
+    font-smoothing antialiased
+    line-height 0.8
+    width 250px
+    overflow-y auto
+    padding 50px 20px 20px 20px
+    font-family Arial, sans-serif
+    ul
+      list-style none
+      margin 0 0 0.6em 0.8em
+    > ul
+      margin-left 0
+    ul
+      li
+        margin-bottom 0.4em
+        a
+          color rgb(100, 200, 250)
+          font-weight 900
+          font-size 80%
+      ul
+        li
+          a
+            color rgb(150, 250, 200)
+            font-weight 500
+            font-size 76%
+        ul
+          li
+            a
+              color rgb(200, 250, 150)
+              font-size 72%
+          ul
+            li
+              a
+                color rgb(250, 200, 150)
+                font-size 68%
+            ul
+              li
+                a
+                  color rgb(250, 150, 200)
+                  font-size 64%
+              ul
+                li
+                  a
+                    color rgb(200, 150, 250)
+                    font-size 64%
+  & > ul
+    margin-left 10px
 
 
 @media (max-width 800px)
-	#toc
-		display none
+  #toc
+    display none
 
-	#wrapcontent
-		width 100%
+  #wrapcontent
+    width 100%
 
-	article
-		width 100%
+  article
+    width 100%
