@@ -3,6 +3,12 @@ const marked = require('marked')
 const loadMarkdown = require('./loadMarkdown')
 const assembleDataObject = require('./assembleDataObject')
 
+marked.setOptions({
+  breaks: true,
+  sanitize: false,
+  langPrefix: 'lang-',
+})
+
 module.exports = async function (mdFilePath, fileName) {
   const markdown = await loadMarkdown(mdFilePath)
 

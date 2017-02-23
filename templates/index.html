@@ -1,63 +1,57 @@
 <!doctype html>
-<html>
+
 <head>
-    <meta charset="UTF-8">
-    <title>{{title}}</title>
-    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css">
-	<link rel="stylesheet" href="/bower_components/highlightjs/styles/tomorrow-night.css"/>
-	<link rel="stylesheet" href="/css/screen.css"/>
+  <meta charset="UTF-8">
+  <title>{{title}}</title>
+  <link rel="stylesheet" href="/styles/font-awesome.min.css">
+  <link rel="stylesheet" href="/styles/tomorrow-night.css"/>
+  <link rel="stylesheet" href="/styles/screen.css"/>
 </head>
-<body>
 
 <div id="wrapcontent">
-
-    <aside id=toolbar>
-        <menu>
-	        <button class="th-list glyphicon glyphicon-th-list"></button>
-	        <button class="info glyphicon glyphicon-info-sign"></button>
-            <button class="adjust glyphicon glyphicon-adjust"></button>
-        </menu>
-    </aside><aside id=toc>
-        <menu></menu>
-        <nav>
-            {{&toc}}
-        </nav>
-    </aside><article>
-        {{&content}}
-    </article>
+  <aside id=toolbar>
+    <menu>
+      <button id='toggle-sidebar' class="fa fa-th-list"></button>
+      <button id='display-info' class="fa fa-info-circle"></button>
+      <button id='adjust' class="fa fa-adjust"></button>
+    </menu>
+  </aside><aside id=toc>
+    <menu></menu>
+    <nav>
+      {{&toc}}
+    </nav>
+  </aside><article>
+    {{&content}}
+  </article>
 </div>
 
 <script type="text/javascript">
-
-    info = {
-        lines: {{lines}},
-        allLines: {{allLines}},
-        paragraphs: {{paragraphs}},
-        words: {{words}},
-        allWords: {{allWords}},
-        chars: {{chars}},
-        images: {{images}},
-        tables: {{tables}},
-        code: {{code}},
-        math: {{math}}
-    }
-
+  infoObj = {
+    lines: {{lines}},
+    allLines: {{allLines}},
+    paragraphs: {{paragraphs}},
+    words: {{words}},
+    allWords: {{allWords}},
+    chars: {{chars}},
+    images: {{images}},
+    tables: {{tables}},
+    code: {{code}},
+    math: {{math}}
+  }
 </script>
-<script src="/bower_components/jquery/dist/jquery.min.js"></script>
-<script src="/bower_components/highlightjs/highlight.pack.js"></script>
-<script src="/js/index.js"></script>
+<script src="/scripts/jquery.min.js"></script>
+<script src="/scripts/highlight.js"></script>
+<script src="/scripts/index.js"></script>
 <script type="text/x-mathjax-config">
-    MathJax.Hub.Config(
-        {
-            asciimath2jax:{
-                delimiters:[['´','´']]
-            }
-        }
-    )
+  MathJax.Hub.Config(
+    {
+      asciimath2jax:{
+        delimiters:[['´','´']]
+      }
+    }
+  )
 </script>
 <script>
-    //define("!>=", "\u2271")
+  //define("!>=", "\u2271")
 </script>
-<script src="//cdn.mathjax.org/mathjax/2.3-latest/MathJax.js?config=AM_HTMLorMML"></script>
-</body>
-</html>
+<script src="/scripts/MathJax.js?config=AM_HTMLorMML"></script>

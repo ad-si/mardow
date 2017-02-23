@@ -1,9 +1,9 @@
-const jQuery = require('jquery')
-const hljs = require('hljs')
+/* globals jQuery, hljs, infoObj */
 
-const links = document.querySelectorAll('aside a')
-const headings = document.querySelectorAll('h1,h2,h3,h4,h5,h6')
-// const images = document.querySelectorAll('article img')
+const doc = window.document
+const links = doc.querySelectorAll('aside a')
+const headings = doc.querySelectorAll('h1,h2,h3,h4,h5,h6')
+// const images = doc.querySelectorAll('article img')
 const map = {
   h1: 'ul ul',
   h2: 'ul ul ul',
@@ -35,25 +35,26 @@ function convertToSlug (text) {
 }
 
 for (let levels = 1; levels <= 6; levels++) {
-  const button = document.createElement('button')
+  const button = doc.createElement('button')
 
-  button.appendChild(document.createTextNode('h' + levels))
-  button.addEventListener('click', () => {
-    const lists = document.querySelectorAll('aside ' + map[this.textContent])
-    const allLists = document.querySelectorAll('aside ul')
+  button.appendChild(doc.createTextNode('h' + levels))
+  button.addEventListener('click', (event) => {
+    event.preventDefault()
 
-    for (let index = 0; index < allLists.length; index++) {
-      allLists[index].style.display = 'inherit'
-    }
-    for (let index = 0; index < lists.length; index++) {
-      lists[index].style.display = 'none'
-    }
+    Array
+      .from(doc.querySelectorAll('aside ul'))
+      .forEach(list => list.style.display = 'inherit')
+
+    Array
+      .from(
+        doc.querySelectorAll('aside ' + map[event.target.textContent])
+      )
+      .forEach(list => list.style.display = 'none')
   })
 
   document
     .querySelector('#toc menu')
     .appendChild(button)
-
 }
 
 
@@ -63,11 +64,11 @@ for (let index = 0; index < headings.length; index++) {
   const $heading = jQuery(headings[index])
 
   $heading
-    .prepend('<span class="glyphicon glyphicon-link"></span>')
+    .prepend('<span class="fa fa-link"></span>')
     .attr('id', convertToSlug($heading.text()))
     .find('span')
     .click(() => {
-      document.location.hash = this.parentNode.id
+      doc.location.hash = this.parentNode.id
     })
 }
 
@@ -94,9 +95,8 @@ jQuery('article img')
   })
 
 document
-  .querySelector('#toolbar .info')
+  .getElementById('display-info')
   .addEventListener('click', () => {
-    const infoObj = {}
     alert(
       `Paragraphs:${'\t'.repeat(6)}${infoObj.paragraphs}
       Lines:${'\t'.repeat(7)}${infoObj.lines}
@@ -113,9 +113,9 @@ document
   })
 
 document
-  .querySelector('#toolbar .th-list')
+  .getElementById('toggle-sidebar')
   .addEventListener('click', () => {
-    const toc = document.querySelector('#toc')
+    const toc = doc.querySelector('#toc')
     const style = window.getComputedStyle(toc)
 
     toc.style.display = style.display === 'none'
