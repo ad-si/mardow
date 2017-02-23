@@ -1,18 +1,13 @@
 const fs = require('fs')
 const url = require('url')
 const path = require('path')
+const http = require('http')
 
 const marked = require('marked')
-const mustache = require('mustache')
-const http = require('http')
 const stylus = require('stylus')
 
+const md2html = require('./source/md2html')
 // const wordHistogram = require('./source/word-histogram')
-
-/** Please stop reading!
- * This is the ugliest code I've ever written.
- * I don't want anybody to see it! ^^
- */
 
 marked.setOptions({
   breaks: true,
@@ -20,83 +15,6 @@ marked.setOptions({
   langPrefix: 'lang-',
 })
 
-
-function wordFilter (word) {
-  return word !== '' &&
-    word.length !== 1
-}
-
-function removePunctuation (word) {
-  return word.replace(/['";:,.\/?\\-]/g, '')
-}
-
-function assembleDataObject (passedData) {
-  const markdown = passedData.markdown
-  const content = passedData.content
-  const firstHeading = passedData.firstHeading
-  const toc = passedData.toc
-  const stats = passedData.stats
-  let template = passedData.template
-
-  const images = markdown.match(/!\[.*]\(.+\)/g)
-  const words = markdown
-    .split(/\s/g)
-    .filter(wordFilter)
-    .map(removePunctuation)
-  const data = {}
-
-  //  TODO: wordHistogram(words)
-
-  data.title = firstHeading
-  data.toc = toc.join('')
-  data.content = content
-
-  data.lines = markdown
-    .split(/\n/g)
-    .filter(line => line !== '')
-    .length
-  data.allLines = markdown.split('\n').length
-  data.words = words.filter(wordFilter).length
-  data.allWords = markdown
-    .split(/\s/g)
-    .filter(word => word !== '')
-    .length
-  data.chars = markdown.length
-  data.images = images ? images.length : 0
-  data.code = stats.code
-  data.tables = stats.tables
-  data.paragraphs = stats.paragraphs
-  data.math = markdown.split('´').length - 1
-
-
-  template = fs.readFileSync(
-    path.join(__dirname, '/templates/index.html'),
-    'utf8'
-  )
-
-  return mustache.render(template, data)
-}
-
-function insertIncludes (markdown, filePath) {
-
-  let includeSection
-
-  // eslint-disable-next-line no-cond-assign
-  while (includeSection = markdown.match(/\<\!--include (.+)--\>/i)) {
-    markdown = markdown.replace(
-      includeSection[0],
-      fs.readFileSync(
-        path.resolve(
-          filePath,
-          '..',
-          includeSection[1] + '.md'
-        )
-      )
-    )
-  }
-
-  return markdown
-}
 
 function imageMiddleware (request, response) {
   const uri = url.parse(request.url).pathname
@@ -245,98 +163,13 @@ function cssMiddleware (request, response) {
 function markdownMiddleware (request, response) {
   const uri = url.parse(request.url).pathname
   const fileName = path.join(process.cwd(), uri)
-  // const fileExtension = fileName.split('.').pop()
-  let markdown = fs.readFileSync(request.mdFilePath, 'utf8')
-  let previousLevel = 0
-  const toc = []
-  let firstHeading = false
-  const stats = {
-    code: 0,
-    tables: 0,
-    images: 0,
-    paragraphs: 0,
-  }
-  let template
-  let inode
 
-
-  try {
-    inode = fs.statSync(fileName)
-  }
-  catch (error) {
-    if (error.code !== 'ENOENT') {
-      throw error
-    }
-  }
-
-  if (!inode || !inode.isDirectory()) {
-    return null
-  }
-  markdown = insertIncludes(markdown, request.mdFilePath)
-
-  const tokens = marked.lexer(markdown)
-
-  tokens.forEach(token => {
-    if (token.type === 'heading') {
-      let diff = token.depth - previousLevel
-
-      if (!firstHeading) {
-        firstHeading = token.text
-      }
-
-      if (diff === 1) {
-        toc.push('<ul><li><a>' + token.text + '</a></li>')
-      }
-      else if (diff === 0) {
-        toc.push('<li><a>' + token.text + '</a></li>')
-      }
-      else if (diff <= -1) {
-
-        for (; diff < 0; diff++) {
-          toc.push('</ul></li>')
-        }
-
-        toc.push('<li><a href="#' + token.text + '">' +
-             token.text + '</a></li>')
-      }
-
-      previousLevel = token.depth
-    }
-    if (token.type === 'code') {
-      stats.code++
-    }
-    if (token.type === 'table') {
-      stats.tables++
-    }
-    if (token.type === 'paragraph') {
-      stats.paragraphs++
-
-      // Omit paragraph if it only contains an image
-      if (token.text.match(/^!\[.*]\(.+\)$/g)) {
-        stats.paragraphs--
-      }
-    }
-  })
-
-  toc.push('</ul>')
-
-
-  marked(markdown, {}, (error, content) => {
-    if (error) throw error
-
-    response.writeHead(200, {
-      'Content-Type': 'text/html',
+  md2html(request.mdFilePath, fileName)
+    .then(html => {
+      response.writeHead(200, {'Content-Type': 'text/html'})
+      response.end(html)
     })
-    response.write(assembleDataObject({
-      markdown,
-      content,
-      firstHeading,
-      toc,
-      stats,
-      template,
-    }), 'utf8')
-    response.end()
-  })
+    .catch(error => console.error(error))
 
   return true
 }
@@ -361,7 +194,6 @@ function server (mdPath) {
     errorMiddleware(request, response)
   }
 }
-
 
 module.exports = (mdPath, port) => {
   // stylusString = fs.readFileSync(__dirname + '/styl/screen.styl', 'utf8'),
