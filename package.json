@@ -9,6 +9,8 @@
   "bin": "bin/cli.js",
   "scripts": {
     "lint": "eslint .",
+    "unit-tests": "node test/index.js",
+    "test": "npm run lint && npm run unit-tests"
   },
   "repository": {
     "type": "git",
