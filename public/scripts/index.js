@@ -69,17 +69,20 @@ document
   .getElementById('display-info')
   .addEventListener('click', () => {
     alert(
-      `Paragraphs:${'\t'.repeat(6)}${infoObj.paragraphs}
-      Lines:${'\t'.repeat(7)}${infoObj.lines}
-      Lines (inclusive empty new lines):${'\t'.repeat(2)}${infoObj.allLines}
-      Words:${'\t'.repeat(7)}${infoObj.words}
-        Words (inclusive one-character words):\t${infoObj.allWords}
-      Characters:\t\t\t\t\t\t${infoObj.chars}
-
-      Images:${'\t'.repeat(7)}${infoObj.images}
-      Tables:${'\t'.repeat(7)}${infoObj.tables}
-      Code Snippets:${'\t'.repeat(6)}${infoObj.code}
-      Math formulas:${'\t'.repeat(6)}${infoObj.math}`
+      [
+        `Paragraphs: ${infoObj.paragraphs}`,
+        `Lines: ${infoObj.lines}`,
+        `  Lines (including empty lines): ${infoObj.allLines}`,
+        `Words: ${infoObj.words}`,
+        `  Words (including one-character words): ${infoObj.allWords}`,
+        `Characters: ${infoObj.chars}`,
+        '',
+        `Images: ${infoObj.images}`,
+        `Tables: ${infoObj.tables}`,
+        `Code snippets: ${infoObj.code}`,
+        `Math formulas: ${infoObj.math}`,
+      ]
+      .join('\n')
     )
   })
 
