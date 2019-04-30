@@ -10,7 +10,8 @@
   "scripts": {
     "lint": "eslint .",
     "unit-tests": "node test/index.js",
-    "test": "npm run lint && npm run unit-tests"
+    "test": "npm run lint && npm run unit-tests",
+    "prepublishOnly": "npm run test"
   },
   "files": [
     "bin",
@@ -31,7 +32,7 @@
     "name": "Adrian Sieber",
     "url": "https://adriansieber.com"
   },
-  "license": "MIT",
+  "license": "AGPL-3.0-or-later",
   "bugs": {
     "url": "https://github.com/adius/mardow/issues"
   },
