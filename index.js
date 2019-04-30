@@ -20,7 +20,8 @@ module.exports = (mdPath, port) => {
 
   app.use('/styles', express.static(getModulePath('highlight.js/styles')))
   app.use('/styles', express.static(getModulePath('font-awesome/css')))
-  app.use(stylus.middleware(getPath('styles')))
+  app.use('/fonts', express.static(getModulePath('font-awesome/fonts')))
+  app.use(stylus.middleware(getPath('public/styles')))
 
   app.use('/scripts', express.static(getModulePath('highlight.js/lib')))
   app.use('/scripts', express.static(getModulePath('mathjax')))
