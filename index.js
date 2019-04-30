@@ -19,7 +19,7 @@ module.exports = (mdPath, port) => {
   // Host files which might be relevant to the markdown file (e.g. images)
   // TODO: Better separate user content and mardow files as
   //   mardow files currently overwrite user files with same path
-  app.use(express.static(__dirname))
+  app.use(express.static(process.cwd()))
 
   app.use(express.static(getPath('public')))
 
