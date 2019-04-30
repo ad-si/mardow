@@ -122,3 +122,16 @@ document
       ? 'inline-block'
       : 'none'
   })
+
+
+// Add outlines when tab key is used (accessibility improvement)
+document.body.addEventListener('keyup', event => {
+  const tabKey = 9
+  if (event.which === tabKey) {
+    document
+      .getElementById('wrapcontent')
+      .classList
+      .remove('no-focus-outline')
+  }
+})
+
