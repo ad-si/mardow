@@ -124,29 +124,33 @@ mark
   padding 1em
   background-color rgb(250,210,0)
 
+
+codeBackgroundColor = hsl(0, 0, 15%)
+
 pre
   margin-bottom 1em
-  background-color rgb(29, 31, 33) !important
-  code
-    font-size 0.85em
-    white-space pre
-    -webkit-font-smoothing subpixel-antialiased
-    font-smoothing subpixel-antialiased
+  background-color codeBackgroundColor
+  padding 0.5em
+  border-radius 3px
+  overflow-y scroll
+  position relative
+
+  &::before
+    box-shadow inset -1.5em 0 0.8em -0.5em alpha(codeBackgroundColor, 0.8)
+    content ''
+    position absolute
+    top 0
+    left 0
+    right 0
+    bottom 0
+    pointer-events none
 
 code
-  margin 0 2px
-  padding 0 5px
-  display inline-block
   color white
-  white-space nowrap
-  text-justify none
-  background-color gray(50)
-  border-radius 2px
-  font-family monospace
+  background-color codeBackgroundColor
   font-size 0.85em
-  font-weight 100
-  -webkit-font-smoothing antialiased
-  font-smoothing antialiased
+  border-radius 2px
+  padding 0.12em 0.4em
 
 
 table
