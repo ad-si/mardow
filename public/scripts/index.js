@@ -1,4 +1,4 @@
-/* globals jQuery, hljs, infoObj */
+/* globals jQuery, infoObj */
 
 const doc = window.document
 const links = doc.querySelectorAll('aside a')
@@ -122,5 +122,3 @@ document
       ? 'inline-block'
       : 'none'
   })
-
-hljs.initHighlighting()

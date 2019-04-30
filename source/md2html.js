@@ -2,12 +2,20 @@ const fsp = require('fs-promise')
 const marked = require('marked')
 const loadMarkdown = require('./loadMarkdown')
 const assembleDataObject = require('./assembleDataObject')
+const hljs = require('highlight.js')
 
 marked.setOptions({
   breaks: true,
   sanitize: false,
   langPrefix: 'lang-',
+  highlight: (code, lang) => {
+    if (['', 'txt', 'text', 'plain'].includes(lang)) {
+      lang = 'plaintext'
+    }
+    return hljs.highlight(lang, code).value
+  },
 })
+
 
 module.exports = async function (mdFilePath, fileName) {
   const markdown = await loadMarkdown(mdFilePath)
