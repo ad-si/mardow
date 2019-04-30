@@ -2,6 +2,7 @@
 
 The ultimate markdown viewer.
 
+![Screenshot](public/images/screenshot.png)
 
 ## Installation
 

@@ -16,6 +16,11 @@ module.exports = (mdPath, port) => {
 
   app.use(favicon(getPath('public/images/favicon.png')))
 
+  // Host files which might be relevant to the markdown file (e.g. images)
+  // TODO: Better separate user content and mardow files as
+  //   mardow files currently overwrite user files with same path
+  app.use(express.static(__dirname))
+
   app.use(express.static(getPath('public')))
 
   app.use('/styles', express.static(getModulePath('highlight.js/styles')))
