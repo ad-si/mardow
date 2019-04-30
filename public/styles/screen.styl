@@ -32,6 +32,10 @@ body
   button:focus
     outline none
 
+:target
+  background-color hsl(50, 100%, 80%)
+  border-radius 3px
+  box-shadow 0 0 0 0.1em hsl(50, 100%, 80%)
 
 #wrapcontent
   background-color gray(230)
@@ -63,14 +67,14 @@ h6
   font-family Arial, Verdana, sans-serif
   line-height 1.5
   position relative
-  right 20px
+  right 2rem
   &:hover span
     visibility visible
   span
-    height 15px
-    width 15px
-    font-size 15px
-    margin-right 5px
+    height 1rem
+    width 1rem
+    font-size 1rem
+    margin-right 1rem
     cursor pointer
     visibility hidden
 

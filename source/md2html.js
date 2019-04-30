@@ -1,8 +1,9 @@
 const fsp = require('fs-promise')
 const marked = require('marked')
+const hljs = require('highlight.js')
+
 const loadMarkdown = require('./loadMarkdown')
 const assembleDataObject = require('./assembleDataObject')
-const hljs = require('highlight.js')
 
 marked.setOptions({
   breaks: true,
@@ -19,6 +20,10 @@ marked.setOptions({
 
 module.exports = async function (mdFilePath, fileName) {
   const markdown = await loadMarkdown(mdFilePath)
+
+  // Must be recreated for each request as it has an internal state
+  // to detect duplicate ids
+  const slugger = new marked.Slugger()
 
   let previousLevel = 0
   const toc = []
@@ -56,11 +61,14 @@ module.exports = async function (mdFilePath, fileName) {
         firstHeading = token.text
       }
 
+      const anchorId = slugger.slug(token.text)
+      const anchor = `<a href="#${anchorId}">${token.text}</a>`
+
       if (diff === 1) {
-        toc.push('<ul><li><a>' + token.text + '</a></li>')
+        toc.push(`<ul><li>${anchor}</li>`)
       }
       else if (diff === 0) {
-        toc.push('<li><a>' + token.text + '</a></li>')
+        toc.push(`<li>${anchor}</li>`)
       }
       else if (diff <= -1) {
 
@@ -68,19 +76,18 @@ module.exports = async function (mdFilePath, fileName) {
           toc.push('</ul></li>')
         }
 
-        toc.push('<li><a href="#' + token.text + '">' +
-             token.text + '</a></li>')
+        toc.push(`<li>${anchor}</li>`)
       }
 
       previousLevel = token.depth
     }
-    if (token.type === 'code') {
+    else if (token.type === 'code') {
       stats.code++
     }
-    if (token.type === 'table') {
+    else if (token.type === 'table') {
       stats.tables++
     }
-    if (token.type === 'paragraph') {
+    else if (token.type === 'paragraph') {
       stats.paragraphs++
 
       // Omit paragraph if it only contains an image

@@ -1,9 +1,7 @@
 /* globals jQuery, infoObj */
 
 const doc = window.document
-const links = doc.querySelectorAll('aside a')
 const headings = doc.querySelectorAll('h1,h2,h3,h4,h5,h6')
-// const images = doc.querySelectorAll('article img')
 const map = {
   h1: 'ul ul',
   h2: 'ul ul ul',
@@ -13,26 +11,6 @@ const map = {
   h6: 'ul ul ul ul ul ul ul',
 }
 
-function convertToSlug (text) {
-  // TODO: Combining characters / Unicode normalisation
-  /* eslint-disable id-length */
-  const dict = {
-    ä: 'ae',
-    ö: 'oe',
-    ü: 'ue',
-    ß: 'ss',
-  }
-  /* eslint-enable */
-
-  return String(text)
-    .toLowerCase()
-    .split('')
-    .map(character => dict[character] || character)
-    .join('')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
-    .replace(/[^\w-]+/g, '')
-}
 
 for (let levels = 1; levels <= 6; levels++) {
   const button = doc.createElement('button')
@@ -60,24 +38,17 @@ for (let levels = 1; levels <= 6; levels++) {
 
 // headings is levels NodeList => forEach not possible
 for (let index = 0; index < headings.length; index++) {
-  // TODO: Prevent id-collisions
   const $heading = jQuery(headings[index])
 
   $heading
     .prepend('<span class="fa fa-link"></span>')
-    .attr('id', convertToSlug($heading.text()))
+    .attr('id', $heading[0].id)
     .find('span')
     .click(() => {
-      doc.location.hash = this.parentNode.id
+      doc.location.hash = $heading[0].id
     })
 }
 
-
-for (let index = 0; index < links.length; index++) {
-  links[index].addEventListener('click', function () {
-    location.hash = convertToSlug(this.textContent)
-  })
-}
 
 jQuery('article img')
   .each(image => {
