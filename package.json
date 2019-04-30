@@ -12,6 +12,12 @@
     "unit-tests": "node test/index.js",
     "test": "npm run lint && npm run unit-tests"
   },
+  "files": [
+    "bin",
+    "public",
+    "source",
+    "templates"
+  ]
   "repository": {
     "type": "git",
     "url": "https://github.com/adius/mardow.git"
