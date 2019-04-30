@@ -17,7 +17,7 @@
     "public",
     "source",
     "templates"
-  ]
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/adius/mardow.git"
