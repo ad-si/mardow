@@ -39,10 +39,7 @@ module.exports = (mdPath, port) => {
     const fileName = path.join(process.cwd(), uri)
 
     md2html(mdPath, fileName)
-      .then(html => {
-        // response.writeHead(200, {'Content-Type': 'text/html'})
-        response.send(html)
-      })
+      .then(html => response.send(html))
       .catch(error => console.error(error))
   })
 

@@ -25,7 +25,7 @@
   </article>
 </div>
 
-<script type="text/javascript">
+<script>
   infoObj = {
     lines: {{lines}},
     allLines: {{allLines}},
@@ -36,22 +36,13 @@
     images: {{images}},
     tables: {{tables}},
     code: {{code}},
-    math: {{math}}
+    math: {{math}},
   }
 </script>
 <script src="/scripts/jquery.min.js"></script>
 <script src="/scripts/highlight.js"></script>
 <script src="/scripts/index.js"></script>
 <script type="text/x-mathjax-config">
-  MathJax.Hub.Config(
-    {
-      asciimath2jax:{
-        delimiters:[['´','´']]
-      }
-    }
-  )
-</script>
-<script>
-  //define("!>=", "\u2271")
+  MathJax.Hub.Config({asciimath2jax: {delimiters: [['´', '´']]}})
 </script>
 <script src="/scripts/MathJax.js?config=AM_HTMLorMML"></script>

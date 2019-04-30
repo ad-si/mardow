@@ -8,7 +8,7 @@ function wordFilter (word) {
 }
 
 function removePunctuation (word) {
-  return word.replace(/['";:,.\/?\\-]/g, '')
+  return word.replace(/['";:,./?\\-]/g, '')
 }
 
 module.exports = (passedData) => {
