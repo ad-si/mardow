@@ -80,17 +80,17 @@ for (let index = 0; index < links.length; index++) {
 }
 
 jQuery('article img')
-  .each(() => {
+  .each(image => {
     const figure = jQuery(
       `<figure><figcaption>
-        ${this.alt}
+        ${image.alt}
       </figcaption></figure>`
     )
 
-    jQuery(this)
+    jQuery(image)
       .after(figure)
 
-    jQuery(this)
+    jQuery(image)
       .prependTo(figure)
   })
 

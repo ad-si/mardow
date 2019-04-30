@@ -14,14 +14,15 @@ module.exports = words => {
 
 
   for (const word in dict) {
-    if (!dict.hasOwnProperty(word)) return
-    histogram.push({
-      nr: index,
-      word,
-      count: dict[word],
-    })
+    if (dict.hasOwnProperty(word)) {
+      histogram.push({
+        nr: index,
+        word,
+        count: dict[word],
+      })
 
-    index++
+      index++
+    }
   }
 
   histogram
