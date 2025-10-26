@@ -1,9 +1,10 @@
-#!/usr/bin/env node
+#!/usr/bin/env bun
 
 import { program } from "commander"
 import fs from "fs"
 import packageFile from "../package.json" with { type: "json" }
 import mardow from "../index.js"
+
 const defaults = {
   port: 8642,
 }
@@ -25,8 +26,9 @@ program
   .option("-p --port <n>", "Set port [default: 8642]")
   .command("serve [file]")
   .description("Serve the markdown file on localhost.")
-  .action(filePath => {
-    const port = program.opts().port || defaults.port
+  .action((filePath?: string) => {
+    // eslint-disable-next-line dot-notation
+    const port = Number(program.opts()["port"]) || defaults.port
 
     if (!filePath) {
       console.info("Usage: serve [options ...] [file]")
@@ -51,7 +53,8 @@ program.parse(process.argv)
 
 if (!program.args.length) {
   if (fs.existsSync("index.md")) {
-    const port = program.opts().port || defaults.port
+    // eslint-disable-next-line dot-notation
+    const port = Number(program.opts()["port"]) || defaults.port
 
     console.info(serveString, "index.md", port)
 

@@ -10,11 +10,17 @@ lint:
 
 .PHONY: test
 test: lint
+	bunx tsc --noEmit
 	bun test/index.js
 
 
+.PHONY: build
+build:
+	bunx tsc
+
+
 .PHONY: install
-install:
+install: test
 	bun link
 
 

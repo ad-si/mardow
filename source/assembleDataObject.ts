@@ -7,16 +7,46 @@ import { dirname } from "path"
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 
-function wordFilter (word) {
+function wordFilter (word: string): boolean {
   return word !== "" &&
     word.length !== 1
 }
 
-function removePunctuation (word) {
+function removePunctuation (word: string): string {
   return word.replace(/['";:,./?\\-]/g, "")
 }
 
-export default function assembleData (passedData) {
+interface PassedData {
+  markdown: string
+  content: string
+  firstHeading: string | boolean
+  toc: string[]
+  stats: {
+    code: number
+    tables: number
+    images: number
+    paragraphs: number
+  }
+  template?: string
+}
+
+interface DataObject {
+  title: string | boolean
+  toc: string
+  content: string
+  lines: number
+  allLines: number
+  words: number
+  allWords: number
+  chars: number
+  images: number
+  code: number
+  tables: number
+  paragraphs: number
+  math: number
+}
+
+export default function assembleData (passedData: PassedData): string {
   const markdown = passedData.markdown
   const content = passedData.content
   const firstHeading = passedData.firstHeading
@@ -29,7 +59,21 @@ export default function assembleData (passedData) {
     .split(/\s/g)
     .filter(wordFilter)
     .map(removePunctuation)
-  const data = {}
+  const data: DataObject = {
+    title: "",
+    toc: "",
+    content: "",
+    lines: 0,
+    allLines: 0,
+    words: 0,
+    allWords: 0,
+    chars: 0,
+    images: 0,
+    code: 0,
+    tables: 0,
+    paragraphs: 0,
+    math: 0,
+  }
 
   //  TODO: wordHistogram(words)
 

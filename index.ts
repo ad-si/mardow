@@ -1,6 +1,6 @@
 import url from "url"
 import path from "path"
-import express from "express"
+import express, { type Express, type Request, type Response } from "express"
 import favicon from "serve-favicon"
 import { fileURLToPath } from "url"
 import { dirname } from "path"
@@ -13,13 +13,13 @@ import md2html from "./source/md2html.js"
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 
-const app = express()
+const app: Express = express()
 
-export default function mardow (mdPath, port) {
-  function getPath (name) {
+export default function mardow (mdPath: string, port: number): void {
+  function getPath (name: string): string {
     return path.join(__dirname, name)
   }
-  function getModulePath (name) {
+  function getModulePath (name: string): string {
     return path.join(__dirname, "node_modules", name)
   }
 
@@ -43,13 +43,13 @@ export default function mardow (mdPath, port) {
 
   app.use(express.static(mdPath))
 
-  app.get("/", (request, response) => {
+  app.get("/", (request: Request, response: Response) => {
     const uri = url.parse(request.url).pathname
-    const fileName = path.join(process.cwd(), uri)
+    const fileName = path.join(process.cwd(), uri ?? "")
 
     md2html(mdPath, fileName)
       .then(html => response.send(html))
-      .catch(error => console.error(error))
+      .catch((error: Error) => console.error(error))
   })
 
   app.listen(port, () => {

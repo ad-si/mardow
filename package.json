@@ -3,14 +3,11 @@
   "type": "module",
   "description": "Markdown Viewer",
   "version": "0.4.0",
-  "main": "index.js",
+  "main": "index.ts",
   "bin": {
-    "mardow": "bin/cli.js"
+    "mardow": "bin/cli.ts"
   },
-  "preferGlobal": "true",
-  "scripts": {
-    "prepublishOnly": "make test"
-  },
+  "preferGlobal": true,
   "files": [
     "bin",
     "public",
@@ -19,7 +16,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/ad-si/mardow.git"
+    "url": "git+https://github.com/ad-si/mardow.git"
   },
   "keywords": [
     "markdown",
@@ -36,21 +33,28 @@
   },
   "dependencies": {
     "@datatypes/path": "^1.0.0",
-    "commander": "^14.0.1",
+    "commander": "^14.0.2",
     "express": "^5.1.0",
     "font-awesome": "^4.7.0",
     "fs-promise": "^2.0.3",
     "highlight.js": "^11.11.1",
     "jquery": "^3.7.1",
-    "marked": "^16.4.0",
+    "marked": "^16.4.1",
     "mathjax": "^4.0.0",
     "mustache": "^4.2.0",
     "serve-favicon": "^2.5.1",
     "stylus": "^0.64.0"
   },
   "devDependencies": {
-    "eslint": "^9.37.0",
+    "@types/express": "^5.0.4",
+    "@types/mustache": "^4.2.6",
+    "@types/node": "^24.9.1",
+    "@types/serve-favicon": "^2.5.7",
+    "@types/stylus": "^0.48.43",
+    "eslint": "^9.38.0",
     "eslint-config-javascript": "^3.0.0",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3",
     "unexpected": "^13.2.1"
   }
 }

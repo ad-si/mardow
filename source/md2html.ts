@@ -1,5 +1,5 @@
-import fsp from "fs-promise"
-import { marked } from "marked"
+import fs from "fs"
+import { marked, type Token } from "marked"
 import hljs from "highlight.js"
 
 import loadMarkdown from "./loadMarkdown.js"
@@ -9,7 +9,7 @@ marked.use({
   breaks: true,
   gfm: true,
   hooks: {
-    preprocess (markdown) {
+    preprocess (markdown: string): string {
       return markdown
     },
   },
@@ -18,27 +18,38 @@ marked.use({
 // Configure highlight.js integration
 marked.use({
   renderer: {
-    code (token) {
-      const codeString = token.text || token
+    code (token: { text?: string, lang?: string }): string {
+      const codeString = token.text || ""
       const lang = token.lang || ""
       let language = lang
       if (["", "txt", "text", "plain"].includes(lang)) {
         language = "plaintext"
       }
-      const highlighted = hljs.highlight(String(codeString), { language }).value
+      const highlighted = hljs
+        .highlight(String(codeString), { language }).value
       return `<pre><code class="lang-${language}">${highlighted}</code></pre>`
     },
   },
 })
 
+interface Stats {
+  code: number
+  tables: number
+  images: number
+  paragraphs: number
+}
 
-export default async function (mdFilePath, fileName) {
+export default async function md2html (
+  mdFilePath: string,
+  fileName: string,
+): Promise<string | null> {
   const markdown = await loadMarkdown(mdFilePath)
+  if (!markdown) return null
 
   // Must be recreated for each request as it has an internal state
   // to detect duplicate ids
-  const slugs = new Map()
-  function slug (text) {
+  const slugs = new Map<string, boolean>()
+  function slug (text: string): string {
     const base = text
       .toLowerCase()
       .trim()
@@ -53,23 +64,24 @@ export default async function (mdFilePath, fileName) {
   }
 
   let previousLevel = 0
-  const toc = []
-  let firstHeading = false
-  const stats = {
+  const toc: string[] = []
+  let firstHeading: string | boolean = false
+  const stats: Stats = {
     code: 0,
     tables: 0,
     images: 0,
     paragraphs: 0,
   }
-  let template
-  let inode
+  let template: string | undefined
+  let inode: fs.Stats | undefined
 
 
   try {
-    inode = fsp.statSync(fileName)
+    inode = fs.statSync(fileName)
   }
-  catch (error) {
-    if (error.code !== "ENOENT") {
+  catch (error: unknown) {
+    const nodeError = error as { code?: string }
+    if (nodeError.code !== "ENOENT") {
       throw error
     }
   }
@@ -80,7 +92,7 @@ export default async function (mdFilePath, fileName) {
 
   const tokens = marked.lexer(markdown)
 
-  tokens.forEach(token => {
+  tokens.forEach((token: Token) => {
     if (token.type === "heading") {
       let diff = token.depth - previousLevel
 
@@ -128,12 +140,24 @@ export default async function (mdFilePath, fileName) {
 
   const content = await marked.parse(markdown)
 
-  return assembleDataObject({
+  const dataObject: {
+    markdown: string
+    content: string
+    firstHeading: string | boolean
+    toc: string[]
+    stats: Stats
+    template?: string
+  } = {
     markdown,
     content,
     firstHeading,
     toc,
     stats,
-    template,
-  })
+  }
+
+  if (template !== undefined) {
+    dataObject.template = template
+  }
+
+  return assembleDataObject(dataObject)
 }
