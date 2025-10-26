@@ -15,23 +15,6 @@ marked.use({
   },
 })
 
-// Configure highlight.js integration
-marked.use({
-  renderer: {
-    code (token: { text?: string, lang?: string }): string {
-      const codeString = token.text || ""
-      const lang = token.lang || ""
-      let language = lang
-      if (["", "txt", "text", "plain"].includes(lang)) {
-        language = "plaintext"
-      }
-      const highlighted = hljs
-        .highlight(String(codeString), { language }).value
-      return `<pre><code class="lang-${language}">${highlighted}</code></pre>`
-    },
-  },
-})
-
 interface Stats {
   code: number
   tables: number
@@ -62,6 +45,29 @@ export default async function md2html (
     slugs.set(id, true)
     return id
   }
+
+  // Configure custom heading renderer to add IDs
+  marked.use({
+    renderer: {
+      code (token: { text?: string, lang?: string }): string {
+        const codeString = token.text || ""
+        const lang = token.lang || ""
+        let language = lang
+        if (["", "txt", "text", "plain"].includes(lang)) {
+          language = "plaintext"
+        }
+        const highlighted = hljs
+          .highlight(String(codeString), { language }).value
+        return `<pre><code class="lang-${language}">${highlighted}</code></pre>`
+      },
+      heading (token: { text: string, depth: number }): string {
+        const text = token.text
+        const level = token.depth
+        const id = slug(text)
+        return `<h${level} id="${id}">${text}</h${level}>`
+      },
+    },
+  })
 
   let previousLevel = 0
   const toc: string[] = []
@@ -137,6 +143,9 @@ export default async function md2html (
   })
 
   toc.push("</ul>")
+
+  // Reset slugs map so heading renderer generates same IDs as TOC
+  slugs.clear()
 
   const content = await marked.parse(markdown)
 

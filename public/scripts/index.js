@@ -109,3 +109,37 @@ document.body.addEventListener("keyup", event => {
   }
 })
 
+
+// Highlight active sidebar link when clicking on TOC links or heading anchors
+function updateActiveTocLink () {
+  // Remove active class from all TOC links
+  doc
+    .querySelectorAll("#toc a")
+    .forEach(link => {
+      link.classList.remove("active")
+    })
+
+  // Get current hash (without the #)
+  const hash = window.location.hash.substring(1)
+
+  if (hash) {
+    // Find and highlight the corresponding TOC link
+    const activeLink = doc.querySelector(`#toc a[href="#${hash}"]`)
+    if (activeLink) {
+      activeLink.classList.add("active")
+    }
+  }
+}
+
+// Wait for DOM to be fully loaded before initializing
+if (doc.readyState === "loading") {
+  doc.addEventListener("DOMContentLoaded", updateActiveTocLink)
+}
+else {
+  // DOM is already loaded
+  updateActiveTocLink()
+}
+
+// Update active link when hash changes (clicking TOC links or heading icons)
+window.addEventListener("hashchange", updateActiveTocLink)
+
