@@ -1,10 +1,10 @@
-module.exports = words => {
+export default words => {
   const histogram = []
   const dict = {}
   let index = 1
 
   words.forEach(word => {
-    if (dict.hasOwnProperty(word)) {
+    if (Object.hasOwn(dict, word)) {
       dict[word] = Number(dict[word]) + 1
     }
     else {
@@ -14,7 +14,7 @@ module.exports = words => {
 
 
   for (const word in dict) {
-    if (dict.hasOwnProperty(word)) {
+    if (Object.hasOwn(dict, word)) {
       histogram.push({
         nr: index,
         word,

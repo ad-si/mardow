@@ -1,5 +1,6 @@
 {
   "name": "mardow",
+  "type": "module",
   "description": "Markdown Viewer",
   "version": "0.4.0",
   "main": "index.js",
@@ -8,10 +9,7 @@
   },
   "preferGlobal": "true",
   "scripts": {
-    "lint": "eslint .",
-    "unit-tests": "node test/index.js",
-    "test": "npm run lint && npm run unit-tests",
-    "prepublishOnly": "npm run test"
+    "prepublishOnly": "make test"
   },
   "files": [
     "bin",
@@ -21,7 +19,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/adius/mardow.git"
+    "url": "https://github.com/ad-si/mardow.git"
   },
   "keywords": [
     "markdown",
@@ -34,28 +32,25 @@
   },
   "license": "AGPL-3.0-or-later",
   "bugs": {
-    "url": "https://github.com/adius/mardow/issues"
+    "url": "https://github.com/ad-si/mardow/issues"
   },
   "dependencies": {
     "@datatypes/path": "^1.0.0",
-    "commander": "^2.20.0",
-    "express": "^4.16.4",
+    "commander": "^14.0.1",
+    "express": "^5.1.0",
     "font-awesome": "^4.7.0",
     "fs-promise": "^2.0.3",
-    "highlight.js": "^9.15.6",
-    "jquery": "^3.4.0",
-    "marked": "^0.6.2",
-    "mathjax": "^2.7.5",
-    "mustache": "^3.0.1",
-    "serve-favicon": "^2.5.0",
-    "stylus": "^0.54.5"
+    "highlight.js": "^11.11.1",
+    "jquery": "^3.7.1",
+    "marked": "^16.4.0",
+    "mathjax": "^4.0.0",
+    "mustache": "^4.2.0",
+    "serve-favicon": "^2.5.1",
+    "stylus": "^0.64.0"
   },
   "devDependencies": {
-    "eslint": "^5.16.0",
-    "eslint-config-javascript": "^1.3.0",
-    "unexpected": "^11.4.0"
-  },
-  "eslintConfig": {
-    "extends": "eslint-config-javascript"
+    "eslint": "^9.37.0",
+    "eslint-config-javascript": "^3.0.0",
+    "unexpected": "^13.2.1"
   }
 }

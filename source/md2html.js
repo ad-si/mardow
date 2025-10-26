@@ -1,29 +1,56 @@
-const fsp = require('fs-promise')
-const marked = require('marked')
-const hljs = require('highlight.js')
+import fsp from "fs-promise"
+import { marked } from "marked"
+import hljs from "highlight.js"
 
-const loadMarkdown = require('./loadMarkdown')
-const assembleDataObject = require('./assembleDataObject')
+import loadMarkdown from "./loadMarkdown.js"
+import assembleDataObject from "./assembleDataObject.js"
 
-marked.setOptions({
+marked.use({
   breaks: true,
-  sanitize: false,
-  langPrefix: 'lang-',
-  highlight: (code, lang) => {
-    if (['', 'txt', 'text', 'plain'].includes(lang)) {
-      lang = 'plaintext'
-    }
-    return hljs.highlight(lang, code).value
+  gfm: true,
+  hooks: {
+    preprocess (markdown) {
+      return markdown
+    },
+  },
+})
+
+// Configure highlight.js integration
+marked.use({
+  renderer: {
+    code (token) {
+      const codeString = token.text || token
+      const lang = token.lang || ""
+      let language = lang
+      if (["", "txt", "text", "plain"].includes(lang)) {
+        language = "plaintext"
+      }
+      const highlighted = hljs.highlight(String(codeString), { language }).value
+      return `<pre><code class="lang-${language}">${highlighted}</code></pre>`
+    },
   },
 })
 
 
-module.exports = async function (mdFilePath, fileName) {
+export default async function (mdFilePath, fileName) {
   const markdown = await loadMarkdown(mdFilePath)
 
   // Must be recreated for each request as it has an internal state
   // to detect duplicate ids
-  const slugger = new marked.Slugger()
+  const slugs = new Map()
+  function slug (text) {
+    const base = text
+      .toLowerCase()
+      .trim()
+      .replace(/[\s\W-]+/g, "-")
+    let id = base
+    let count = 1
+    while (slugs.has(id)) {
+      id = `${base}-${count++}`
+    }
+    slugs.set(id, true)
+    return id
+  }
 
   let previousLevel = 0
   const toc = []
@@ -42,7 +69,7 @@ module.exports = async function (mdFilePath, fileName) {
     inode = fsp.statSync(fileName)
   }
   catch (error) {
-    if (error.code !== 'ENOENT') {
+    if (error.code !== "ENOENT") {
       throw error
     }
   }
@@ -54,14 +81,14 @@ module.exports = async function (mdFilePath, fileName) {
   const tokens = marked.lexer(markdown)
 
   tokens.forEach(token => {
-    if (token.type === 'heading') {
+    if (token.type === "heading") {
       let diff = token.depth - previousLevel
 
       if (!firstHeading) {
         firstHeading = token.text
       }
 
-      const anchorId = slugger.slug(token.text)
+      const anchorId = slug(token.text)
       const anchor = `<a href="#${anchorId}">${token.text}</a>`
 
       if (diff === 1) {
@@ -73,7 +100,7 @@ module.exports = async function (mdFilePath, fileName) {
       else if (diff <= -1) {
 
         for (; diff < 0; diff++) {
-          toc.push('</ul></li>')
+          toc.push("</ul></li>")
         }
 
         toc.push(`<li>${anchor}</li>`)
@@ -81,13 +108,13 @@ module.exports = async function (mdFilePath, fileName) {
 
       previousLevel = token.depth
     }
-    else if (token.type === 'code') {
+    else if (token.type === "code") {
       stats.code++
     }
-    else if (token.type === 'table') {
+    else if (token.type === "table") {
       stats.tables++
     }
-    else if (token.type === 'paragraph') {
+    else if (token.type === "paragraph") {
       stats.paragraphs++
 
       // Omit paragraph if it only contains an image
@@ -97,21 +124,16 @@ module.exports = async function (mdFilePath, fileName) {
     }
   })
 
-  toc.push('</ul>')
+  toc.push("</ul>")
 
+  const content = await marked.parse(markdown)
 
-  return new Promise((resolve, reject) => {
-    marked(markdown, {}, (error, content) => {
-      if (error) reject(error)
-
-      resolve(assembleDataObject({
-        markdown,
-        content,
-        firstHeading,
-        toc,
-        stats,
-        template,
-      }))
-    })
+  return assembleDataObject({
+    markdown,
+    content,
+    firstHeading,
+    toc,
+    stats,
+    template,
   })
 }

@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 
-const program = require('commander')
-const fs = require('fs')
-const packageFile = require('../package.json')
-const mardow = require('../index.js')
+import { program } from "commander"
+import fs from "fs"
+import packageFile from "../package.json" with { type: "json" }
+import mardow from "../index.js"
 const defaults = {
-  port: 3000,
+  port: 8642,
 }
-const serveString = 'Serve %s on http://localhost:%s'
+const serveString = "Serve %s on http://localhost:%s"
 
 
 // function range (val) {
@@ -22,17 +22,17 @@ const serveString = 'Serve %s on http://localhost:%s'
 
 
 program
-  .option('-p --port <n>', 'Set port [default: 3000]')
-  .command('serve')
-  .description('Serve the markdown file on localhost.')
+  .option("-p --port <n>", "Set port [default: 8642]")
+  .command("serve [file]")
+  .description("Serve the markdown file on localhost.")
   .action(filePath => {
-    const port = program.port || defaults.port
+    const port = program.opts().port || defaults.port
 
-    if (typeof filePath === 'object') {
-      console.info('Usage: serve [options ...] [file]')
+    if (!filePath) {
+      console.info("Usage: serve [options ...] [file]")
     }
     else if (!fs.existsSync(filePath)) {
-      console.error(filePath + ' does not exist!')
+      console.error(filePath + " does not exist!")
     }
     else {
       console.info(serveString, filePath, port)
@@ -42,20 +42,20 @@ program
 
 program
   .version(packageFile.version)
-  .usage('[command] [options] [file]')
-  .description('')
+  .usage("[command] [options] [file]")
+  .description("")
 
 
 program.parse(process.argv)
 
 
 if (!program.args.length) {
-  if (fs.existsSync('index.md')) {
-    const port = program.port || defaults.port
+  if (fs.existsSync("index.md")) {
+    const port = program.opts().port || defaults.port
 
-    console.info(serveString, 'index.md', port)
+    console.info(serveString, "index.md", port)
 
-    mardow('./index.md', port)
+    mardow("./index.md", port)
   }
   else {
     program.help()

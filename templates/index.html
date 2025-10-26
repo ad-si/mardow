@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <title>{{title}}</title>
   <link rel="stylesheet" href="/styles/font-awesome.min.css">
-  <link rel="stylesheet" href="/styles/tomorrow-night.css"/>
+  <link rel="stylesheet" href="/styles/base16/tomorrow-night.css"/>
   <link rel="stylesheet" href="/styles/screen.css"/>
 </head>
 
@@ -41,7 +41,12 @@
 </script>
 <script src="/scripts/jquery.min.js"></script>
 <script src="/scripts/index.js"></script>
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({asciimath2jax: {delimiters: [['´', '´']]}})
+<script>
+  window.MathJax = {
+    loader: { load: ["input/asciimath", "output/chtml"] },
+    asciimath: {
+      delimiters: [["´", "´"]],
+    },
+  }
 </script>
-<script src="/scripts/MathJax.js?config=AM_HTMLorMML"></script>
+<script src="/scripts/tex-mml-chtml.js" id="MathJax-script"></script>

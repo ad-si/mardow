@@ -1,28 +1,28 @@
-const fsp = require('fs-promise')
-const Path = require('@datatypes/path')
+import fsp from "fs-promise"
+import Path from "@datatypes/path"
 
 
-module.exports = function replaceIncludes (filePath) {
+export default function replaceIncludes (filePath) {
   const mdIncludeRegex = /!\[.+\]\(.+\.md\)/gi
-  let expandedMarkdown = ''
+  let expandedMarkdown = ""
 
   if (!filePath) return
 
   return fsp
-    .readFile(String(filePath), 'utf8')
+    .readFile(String(filePath), "utf8")
     .then(fileContent => {
       expandedMarkdown = fileContent
 
       return Array.from(
         // Remove duplicate entries
-        new Set(fileContent.match(mdIncludeRegex))
+        new Set(fileContent.match(mdIncludeRegex)),
       )
     })
     .then(matches => matches
       .map(matchedString => {
         const fileNameMatch = matchedString.match(/\((.+)\)$/i)
         const newFilePath = Path.fromString(
-          `${filePath}/../${fileNameMatch[1]}`
+          `${filePath}/../${fileNameMatch[1]}`,
         )
 
         return replaceIncludes(newFilePath)
@@ -30,7 +30,7 @@ module.exports = function replaceIncludes (filePath) {
             expandedMarkdown = expandedMarkdown
               .replace(matchedString, expandedContent)
           })
-      })
+      }),
     )
     .then(includePromises => Promise.all(includePromises))
     .then(() => expandedMarkdown)
