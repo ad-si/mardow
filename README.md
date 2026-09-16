@@ -43,3 +43,14 @@ mardow --help
 
 - Highlighting even works correctly when there are several sections
     with the same name
+
+
+## Related
+
+- [mdv] - Markdown superset for documents, dashboards, and slides
+    with embedded data and visualizations.
+- [Quarkdown] - Markdown-based typesetting system with scripting support
+    which compiles to papers, presentations, websites, and books.
+
+[mdv]: https://github.com/drasimwagan/mdv
+[Quarkdown]: https://github.com/iamgio/quarkdown
